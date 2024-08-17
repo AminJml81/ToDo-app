@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div class="modal fade" id="taskmodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete {{task.title}}</h5>
+                    <a href='' class="btn btn-simple close position-absolute top-0 end-0 m-2" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </a>    
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete '{{task.title}}'</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-simple" data-dismiss="modal">Close</button>
+                    <a href="{% url 'todo:task-delete' slug=task.slug%}"><button type="button" class="btn btn-danger btn-simple" >Delete</button></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

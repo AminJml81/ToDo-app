@@ -1,0 +1,57 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Task</title>
+    <link rel="stylesheet" href="{% static 'css/form.css' %}">
+</head>
+<body>
+
+    {% include "base.html" %}
+
+    {% block content %}
+    <div class='page-content'>
+        <div class="form-v5-content">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <form id="taskform" class="form-detail" method="POST" action> {% csrf_token %}
+                        <div class="form-row">
+                            <label class="" style="font-size:1.4rem;">Title</label>
+                            <input type="text" class="form-control rounded-left input-text" name="title">
+                        </div>
+                        <div class="form-row">
+                            <label class="">Description</label>
+                            <textarea type="text" class="form-control rounded-left input-text" name="description"></textarea>
+                        </div>
+                        <div class="form-row">
+                        <select name='status' class="form-select" form='taskform' >
+                            <option value="TD" selected>Todo</option>
+                            <option value="IP">In Progress</option>
+                            <option value="DO">Done</option>
+                        </select>
+                        </div>
+                        <div class="mt-2 form-row-last">
+                            <button class="btn btn-primary" form="taskform" type='submit'>Add</button>
+                        </div>
+                    </form>    
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endblock content %}
+
+    <script>
+        const form = document.querySelector('form');
+        form.addEventListener('keypress', function (event) {
+        if (event.keyCode === 13) {
+            event.preventDefault();
+            form.submit();
+        }
+        });
+    </script>
+
+</body>
+</html>

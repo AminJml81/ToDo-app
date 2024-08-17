@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+
+{% load static %} 
+
+<html lang="en">
+<head>
+    <title>{{task.title}}</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/form.css' %}">
+    
+</head>
+<body >
+    {% include "base.html" %}
+
+    {% block content %}
+    <div class='page-content'>
+        <div class="form-v5-content">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <form id="taskform" class="form-detail" method="POST" action=> {% csrf_token %}
+                        <div class="form-row">
+                            <label class="" style="font-size:1.4rem;">Title</label>
+                            <input type="text" class="form-control rounded-left input-text" name="title" value="{{task.title}}">
+                        </div>
+                        <div class="form-row">
+                            <label class="">Description</label>
+                            <textarea type="text" class="form-control rounded-left input-text" name="description">{{task.description}}</textarea>
+                        </div>
+                        <div class="form-row">
+                        <select name='status' class="form-select" form='taskform' >
+                            {% if task.status == 'TD' %}
+                            <option value="TD" selected>Todo</option>
+                            <option value="IP">In Progress</option>
+                            <option value="DO">Done</option>
+
+                            {% elif task.status == 'DO' %}
+                            <option value="DO" selected>Done</option>
+                            <option value="IP">In Progress</option>
+                            <option value="TD" >Todo</option>
+
+                            {%else%}
+                            <option value="DO">Done</option>
+                            <option value="IP" selected>In Progress</option>
+                            <option value="TD" >Todo</option>
+                            {% endif %}
+                        </select>
+                        </div>
+                        <div class="mt-2 form-row-last">
+                            <button class="btn btn-primary" form="taskform" type='submit'>Submit</button>
+                            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#taskmodal">
+                                Delete
+                            </button>
+                        </div>
+                    </form>    
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% include "deletemodal.html" %}
+    
+    {% endblock content %}    
+        
+</body>
+</html>

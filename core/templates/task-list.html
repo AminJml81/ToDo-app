@@ -1,0 +1,90 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo-List</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">    
+    <link rel="stylesheet" href="{% static 'css/todo.css'%}">
+
+</head>
+<body>
+
+    {% include "base.html" %}
+
+    {% block content %}
+    <div class="container-md d-flex justify-content-center mt-3">
+    <table class="table table-striped table-bordered text-center">
+        <thead>
+          <tr>
+            <th class="col" scope="col">#</th>
+            <th class="col" scope="col">Task</th>
+            <th class="col" scope="col">Description</th>
+            <th class="col" scope="col">Status</th>
+            <th class="col" scope="col">Actions</th>
+            {% comment %} <th scope="col">Handle</th> {% endcomment %}
+          </tr>
+        </thead>
+        <tbody class="table-group-divider">
+          {% for task in tasks %}
+          <tr>
+            {% if task.status == 'DO' %}
+            <th class="table-success" scope="row">{{forloop.counter}}</th>
+            {% elif task.status == 'IP' %}
+            <th class="table-warning" scope="row">{{forloop.counter}}</th>
+            {% else %}
+            <th class="table-danger" scope="row">{{forloop.counter}}</th>
+            {%endif%}
+            <td><a class="link-dark link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover" href="{% url 'todo:task-detail' slug=task.slug %}">{{task.title}}</a></td>
+            <td>{{task.description|truncatewords:10|truncatechars:20}}</td>
+            {% if task.status == 'DO' %}
+            <td>Done</td>
+            {% elif task.status == 'IP' %}
+            <td>In Progress</td>
+            {% else %}
+            <td>Todo</td>
+            {%endif%}
+            <td>
+              <a href="{% url 'todo:task-detail' slug=task.slug %}" class="view" title="View" data-toggle="tooltip"><i class="material-icons">&#xE417;</i></a>
+              <a href="{% url 'todo:task-update' slug=task.slug %}" class="edit" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a>
+              <a href="" class="delete" title="Delete" data-toggle="modal" data-target="#exampleModal-{{task.title}}"><i class="material-icons">&#xE872;</i></a>
+            </td>
+          </tr>
+          
+          <div class="modal fade" id="exampleModal-{{task.title}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel-{{task.title}}" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="exampleModalLabel-{{task.title}}">Delete {{task.title}}</h5>
+                  <a href='' class="btn btn-simple close position-absolute top-0 end-0 m-2" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </a>
+                </div>
+                <div class="modal-body">
+                  <p>Are you sure you want to delete '{{task.title}}' ?</p>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-simple" data-dismiss="modal">Close</button>
+                  <a href="{% url 'todo:task-delete' slug=task.slug%}"><button type="button" class="btn btn-danger">Delete</button></a>
+                </div>
+            </div>
+          </div>
+
+          {%endfor%}
+        </tbody>
+    </table>
+
+    </div>
+    
+
+    <div class="container mt-2">
+      <div class="align-items-center">
+        <a href="{% url 'todo:task-create'%}"><button type="button" class="btn btn-outline-dark add-new"><i class="fa fa-plus"></i> Add New</button></a>
+      </div>
+    </div>
+
+    {% endblock content %}
+
+</body>
+</html>
