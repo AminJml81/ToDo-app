@@ -136,3 +136,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 AUTH_USER_MODEL = 'accounts.User'
 
 AUTHENTICATION_BACKENDS = ['accounts.backends.EmailUsernameBackend']
+
+LOGIN_REDIRECT_URL = '/tasks/'
+LOGIN_URL = '/accounts/login/'
+LOGOUT_REDIRECT_URL = '/tasks/'

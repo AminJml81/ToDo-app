@@ -1,0 +1,39 @@
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'css/bootstrap/bootstrap.css' %}">
+
+
+{% if form.errors %}
+	{% for field in form %}
+		{% for error in field.errors %}
+			<div class="alert alert-danger notification" role="alert">
+				<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<strong>{{ error }}</strong>
+			</div>
+		{% endfor %}
+	{% endfor %}
+	{% for error in form.non_field_errors %}
+		<div class="alert alert-danger notification" role="alert">
+			<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+			<span aria-hidden="true">&times;</span>
+			</button>
+			<strong>{{ error}}</strong>
+		</div>
+	{% endfor %}
+{% endif %}
+
+{% for message in messages %}
+  <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{message.tags}}{% endif %} notification" role="alert">
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+  </button>
+      {{ message }}
+  </div>
+{% endfor %}
+
+
+
+<script src="{%static 'js/bootstrap.min.js'%}"></script>
+<script src="{% static 'js/jquery-3.2.1.min.js'%}"></script>
