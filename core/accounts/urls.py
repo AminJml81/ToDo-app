@@ -18,14 +18,14 @@ urlpatterns = [
          LogoutView.as_view(template_name = "registration/logout.html"), name='logout'),
 
     path('password/change/',
-          CustomPasswordChangeView.as_view(), name='change-password'),
+          CustomPasswordChangeView.as_view(), name='password-change'),
           
     path('password/reset/',
-          PasswordResetView.as_view(success_url=reverse_lazy("account:reset-password-done")), name='reset-password'),
+          PasswordResetView.as_view(success_url=reverse_lazy("account:password-reset-done")), name='password-reset'),
     path('password/reset/done/',
-          PasswordResetDoneView.as_view(), name='reset-password-done'),
+          PasswordResetDoneView.as_view(), name='password-reset-done'),
     path('password/reset/confirm/<uidb64>/<token>/',
-          PasswordResetConfirmView.as_view(success_url = reverse_lazy("account:password-reset-complete")), name='reset-password-confirm'),
+          PasswordResetConfirmView.as_view(success_url = reverse_lazy("account:password-reset-complete")), name='password-reset-confirm'),
     path('password/reset/complete/',
           PasswordResetCompleteView.as_view(), name='password-reset-complete' )
 ]
