@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # sites framework
+    'django.contrib.sites',
 
     # local
     'todo.apps.TodoConfig',
@@ -149,5 +151,6 @@ EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
-#zfhu lfma xqzd yujw
-#vull eymo tocw odeg
+
+# sites framework
+SITE_ID = 1
