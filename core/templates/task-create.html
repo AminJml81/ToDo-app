@@ -17,10 +17,12 @@
         <div class="form-v5-content">
             <div class="container">
                 <div class="row justify-content-center">
+                    
                     <form id="taskform" class="form-detail" method="POST" action> {% csrf_token %}
+                        {% include "account-messages.html" %}
                         <div class="form-row">
                             <label class="" style="font-size:1.4rem;">Title</label>
-                            <input type="text" class="form-control rounded-left input-text" name="title">
+                            <input required type="text" class="form-control rounded-left input-text" name="title">
                         </div>
                         <div class="form-row">
                             <label class="">Description</label>

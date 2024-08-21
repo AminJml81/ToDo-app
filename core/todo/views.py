@@ -35,6 +35,15 @@ class CreateTaskView(CreateView):
     form_class = TaskForm 
     template_name = 'task-create.html'
     success_url = reverse_lazy('todo:task-list')
+        
+    def post(self, requets, *args, **kwargs):
+        self.object = None
+        form = self.get_form()
+        form.instance.user = self.request.user
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
 
 
 class DeleteTaskView(DeleteView):

@@ -1,8 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from accounts.models import User
-# from accounts.forms import CustomUserCreationForm, CustomUserChangeForm
-#from accounts.forms import UserCreationForm
 
 
 @admin.register(User)
@@ -10,8 +8,6 @@ class CustomUserAdmin(UserAdmin):
     """
     Custom admin panel for user management with add and change forms plus password
     """
-    #add_form = CustomUserCreationForm
-    # form = CustomUserChangeForm
     model = User
     list_display = ("email", "is_superuser", "is_active")
     list_filter = ("email", "is_superuser", "is_active")
