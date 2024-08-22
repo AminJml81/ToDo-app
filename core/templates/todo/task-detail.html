@@ -6,9 +6,9 @@
 <head>
     <title>{{task.title}}</title>
     <meta charset="UTF-8">
+    <meta name="description" content="{{taks.title}} page">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{% static 'css/form.css' %}">
-    
+    <link rel="stylesheet" href="{% static 'css/form.css' %}">    
 </head>
 <body >
     {% include "base.html" %}
@@ -18,18 +18,17 @@
         <div class="form-v5-content">
             <div class="container">
                 <div class="row justify-content-center">
-                    <form id="taskform" class="form-detail" method="POST" action=> {% csrf_token %}
-                        {% include "account-messages.html" %}
+                    <form id="taskform" class="form-detail">
                         <div class="form-row">
                             <label class="" style="font-size:1.4rem;">Title</label>
-                            <input type="text" class="form-control rounded-left input-text" name="title" value="{{task.title}}">
+                            <input disabled type="text" class="form-control rounded-left input-text" name="title" value="{{task.title}}">
                         </div>
                         <div class="form-row">
                             <label class="">Description</label>
-                            <textarea type="text" class="form-control rounded-left input-text" name="description">{{task.description}}</textarea>
+                            <textarea disabled type="text" class="form-control rounded-left input-text" name="description">{{task.description}}</textarea>
                         </div>
                         <div class="form-row">
-                        <select name='status' class="form-select" form='taskform' >
+                        <select disabled name='status' class="form-select" form='taskform' >
                             {% if task.status == 'TD' %}
                             <option value="TD" selected>Todo</option>
                             <option value="IP">In Progress</option>
@@ -48,7 +47,7 @@
                         </select>
                         </div>
                         <div class="mt-2 form-row-last">
-                            <button class="btn btn-primary" form="taskform" type='submit'>Submit</button>
+                            <a href="{% url 'todo:task-update' slug=task.slug%}" class="btn btn-primary" >Update</a>
                             <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#taskmodal">
                                 Delete
                             </button>
@@ -60,8 +59,8 @@
     </div>
 
     {% include "deletemodal.html" %}
-    
-    {% endblock content %}    
-        
+
+    {% endblock content %}   
+ 
 </body>
 </html>

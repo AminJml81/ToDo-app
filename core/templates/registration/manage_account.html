@@ -22,29 +22,29 @@
 							<span class="fa fa-user-o"></span>
 						</div>
 
-						{% include "account-messages.html" %}
+						{% include "messages.html" %}
 
 						<h3 class="text-center mb-4">Manage Account</h3>
                         {% if user.is_authenticated %}
                         <div class="form-group">
                             <div class="w-50">
-                                <a href="{% url 'account:logout' %}">Log Out</a>
+                                <a href="{% url 'account:logout' %}" class="link-no-under">Log Out</a>
                             </div> 
                         </div>
                         <div class="form-group">
                             <div class="w-50">
-                                <a href="{% url 'account:password-change' %}">Change Password</a>
+                                <a href="{% url 'account:password-change' %}" class="link-no-under">Change Password</a>
                             </div>
                         </div>
                         {% else %}
                         <div class="form-group">
                             <div class="w-50">
-                                <a href="{% url 'account:login' %}">Log In</a>
+                                <a href="{% url 'account:login' %}" class="link-no-under">Log In</a>
                             </div>
                         </div>
                         <div class="form-group">
                             <div class="w-50">
-                                <a href="{% url 'account:signup' %}">Sign Up</a>
+                                <a href="{% url 'account:signup' %}" class="link-no-under">Sign Up</a>
                             </div>
                         </div>
                         {% endif %}
