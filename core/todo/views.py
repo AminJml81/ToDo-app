@@ -2,6 +2,7 @@ from django.views.generic import (ListView, DetailView, UpdateView, CreateView, 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from todo.models import Task
+from django.db.models import Q
 
 # Create your views here.
 
@@ -15,8 +16,11 @@ class ListTasksView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         tasks = Task.objects.filter(user=self.request.user).order_by('-status')
+        if q:=self.request.GET.get('q'):
+            tasks = tasks.filter(Q(title__icontains=q) | Q(description__icontains=q))
+    
         return tasks
-
+    
 
 class TaskDetailView(LoginRequiredMixin, DetailView):
     model = Task
