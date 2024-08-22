@@ -1,4 +1,5 @@
 from django.views.generic import (ListView, DetailView, UpdateView, CreateView, DeleteView)
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from todo.models import Task
 
@@ -7,30 +8,39 @@ from todo.models import Task
 from todo.forms import TaskForm
 
 
-class ListTasksView(ListView):
+class ListTasksView(LoginRequiredMixin, ListView):
     model = Task
     template_name = 'task-list.html'
     context_object_name = 'tasks'
 
     def get_queryset(self):
-        tasks = Task.objects.order_by('status')
+        tasks = Task.objects.filter(user=self.request.user).order_by('-status')
         return tasks
 
 
-class TaskDetailView(DetailView):
+class TaskDetailView(LoginRequiredMixin, DetailView):
     model = Task
     template_name = 'task-detail.html'
     context_object_name = 'task'
 
+    def get_queryset(self):
+        task = Task.objects.filter(slug=self.kwargs['slug'], user=self.request.user)
+        return task
 
-class TaskUpdateView(UpdateView):
+
+class TaskUpdateView(LoginRequiredMixin, UpdateView):
     model = Task
     form_class = TaskForm
     template_name = 'task-update.html'
     context_object_name = 'task'
+
+    
+    def get_queryset(self):
+        tasks = Task.objects.filter(user=self.request.user)
+        return tasks
     
 
-class CreateTaskView(CreateView):
+class CreateTaskView(LoginRequiredMixin, CreateView):
     model = Task
     form_class = TaskForm 
     template_name = 'task-create.html'
@@ -46,10 +56,15 @@ class CreateTaskView(CreateView):
             return self.form_invalid(form)
 
 
-class DeleteTaskView(DeleteView):
+class DeleteTaskView(LoginRequiredMixin, DeleteView):
     model = Task
     context_object_name = 'task'
     success_url = reverse_lazy('todo:task-list')
+
+
+    def get_queryset(self):
+        tasks = Task.objects.filter(user=self.request.user)
+        return tasks
 
     def get(self, request, *args, **kwargs):
         return self.delete(request, *args, **kwargs)

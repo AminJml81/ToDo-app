@@ -20,9 +20,15 @@
               <li class="nav-item">
                 <a class="nav-link active" aria-current="page" href="{% url 'todo:task-list'%}">Home</a>
               </li>
+              {% if user.is_authenticated %}
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'account:manage'%}">{{user.username}}</a>
+              </li>
+              {%else%}
               <li class="nav-item">
                 <a class="nav-link" href="{% url 'account:manage'%}">Account</a>
               </li>
+              {%endif%}
             </ul>
 
             {% comment %} <form class="d-flex" role="search">
