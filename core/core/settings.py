@@ -40,6 +40,7 @@ INSTALLED_APPS = [
 
     # third party
     'django.contrib.sites',
+    'rest_framework',
 
     # local
     'todo.apps.TodoConfig',

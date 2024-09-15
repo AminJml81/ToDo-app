@@ -22,8 +22,8 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path('tasks/', include('todo.urls')),
     path('accounts/', include("accounts.urls")),
+    path('api-auth/', include('rest_framework.urls')),
 ]
-
 
 if DEBUG:
     from debug_toolbar.toolbar import debug_toolbar_urls
