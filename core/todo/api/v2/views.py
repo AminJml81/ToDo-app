@@ -27,23 +27,19 @@ class ListCreateTaskAPIView(APIView):
     
 
     def filter_tasks(self, request, tasks):
-        # getting status, title, description query parameter and 
-        # filter the tasks
+        # getting status query parameter and filter the tasks
         status = request.query_params.get('status')
-        title = request.query_params.get('title')
-        description = request.query_params.get('description')
         if status:
             tasks = tasks.filter(status=status)
-        if title:
-            tasks = tasks.filter(title__icontains=title)
-        if description:
-            tasks = tasks.filter(description__icontains=description)
         return tasks
     
     def search_tasks(self, request, tasks):
+        # getting search query parameter and filter the tasks based on
+        # title or description with icontains lookup
         search_key = request.query_params.get('search')
-        tasks = tasks.filter(Q(title__icontains=search_key) |
-                            Q(description__icontains=search_key))
+        if search_key:
+            tasks = tasks.filter(Q(title__icontains=search_key) |
+                                Q(description__icontains=search_key))
         return tasks
     
     def post(self, request):

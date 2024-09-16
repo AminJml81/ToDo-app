@@ -20,16 +20,14 @@ class ListCreateTaskGenericView(GenericAPIView):
         return TaskReadSerializer
     
     def get_queryset(self):
-        tasks = Task.objects.filter(user=self.request.user)
-        tasks = self.filter_queryset(tasks)
-        return tasks
-            
+        return Task.objects.filter(user=self.request.user)            
 
     def get(self, request, *args, **kwargs):
         paginator = CustomPagination()
 
         tasks = self.get_queryset()
-        tasks_page = paginator.paginate_queryset(tasks, request)
+        filtered_tasks = self.filter_queryset(tasks)
+        tasks_page = paginator.paginate_queryset(filtered_tasks, request)
         serializer = self.get_serializer(tasks_page, many=True, context={'request':self.request})
         return Response(serializer.data)
     

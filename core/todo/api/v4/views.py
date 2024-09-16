@@ -20,7 +20,6 @@ class ListCreateTaskGenericView(ListCreateAPIView):
         return Task.objects.filter(user=self.request.user)
     
         
-
 class RetriveUpdateDeleteTaskGenericView(RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated]
 

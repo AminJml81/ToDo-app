@@ -4,11 +4,4 @@ from ..models import Task
 
 
 class TaskFilter(filters.FilterSet):
-    status = filters.ChoiceFilter(choices=Task.TaskStatus.choices
-                                  )
-    class Meta:
-        model = Task
-        fields = {
-            'title': ['icontains'],
-            'description': ['icontains'], 
-        }
+    status = filters.ChoiceFilter(choices=Task.TaskStatus.choices)
