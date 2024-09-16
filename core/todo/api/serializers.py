@@ -48,5 +48,6 @@ class TaskCreateUpdateSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         representaion = super().to_representation(instance)
         user = UserSerilizer(instance.user)
-        representaion['user'] = UserSerilizer(instance.user).data
+        representaion['user'] = UserSerilizer(user).data
+        representaion['status'] = instance.get_status_display()
         return representaion
