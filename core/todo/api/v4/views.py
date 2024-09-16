@@ -16,10 +16,6 @@ class ListCreateTaskGenericView(ListCreateAPIView):
     def get_queryset(self):
         return Task.objects.filter(user=self.request.user)
     
-    def get_serializer_context(self):
-        context = super().get_serializer_context()
-        context['version'] = 'api-v4'
-        return context
         
 
 class RetriveUpdateDeleteTaskGenericView(RetrieveUpdateDestroyAPIView):

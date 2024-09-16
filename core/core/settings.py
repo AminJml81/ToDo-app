@@ -156,3 +156,10 @@ EMAIL_USE_SSL = False
 
 # sites framework
 SITE_ID = 1
+
+
+# restframework 
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'todo.api.pagination.CustomPagination',                                                  
+    'PAGE_SIZE': 10
+}

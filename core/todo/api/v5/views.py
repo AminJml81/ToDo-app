@@ -16,7 +16,3 @@ class TaskViewSet(ModelViewSet):
             return TaskCreateUpdateSerializer
         return TaskReadSerializer
     
-    def get_serializer_context(self):
-        context = super().get_serializer_context()
-        context['version'] = 'api-v5'
-        return context

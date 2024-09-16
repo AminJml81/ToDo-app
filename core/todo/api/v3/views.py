@@ -5,6 +5,7 @@ from rest_framework import status
 
 from ...models import Task
 from ..serializers import TaskReadSerializer, TaskCreateUpdateSerializer
+from ..pagination import CustomPagination
 
 
 class ListCreateTaskGenericView(GenericAPIView):
@@ -19,8 +20,11 @@ class ListCreateTaskGenericView(GenericAPIView):
         return Task.objects.filter(user=self.request.user)
     
     def get(self, request, *args, **kwargs):
-        items = self.get_queryset()
-        serializer = self.get_serializer(items, many=True, context={'request':self.request})
+        paginator = CustomPagination()
+
+        tasks = self.get_queryset()
+        tasks_page = paginator.paginate_queryset(tasks, request)
+        serializer = self.get_serializer(tasks_page, many=True, context={'request':self.request})
         return Response(serializer.data)
     
     

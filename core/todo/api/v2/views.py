@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 
+from ..pagination import CustomPagination
 from ...models import Task
 from ..serializers import TaskReadSerializer, TaskCreateUpdateSerializer
 
@@ -14,8 +15,11 @@ class ListCreateTaskAPIView(APIView):
 
     def get(self, request):
         # task lists
+        paginator = CustomPagination()
+
         tasks = Task.objects.filter(user=request.user)
-        serializer = TaskReadSerializer(tasks, many=True, context={'request':request})
+        tasks_page = paginator.paginate_queryset(tasks, request)
+        serializer = TaskReadSerializer(tasks_page, many=True, context={'request':request})
         return Response(serializer.data)
     
 

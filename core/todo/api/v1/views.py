@@ -7,6 +7,7 @@ from rest_framework import status
 
 from ...models import Task
 from ..serializers import TaskReadSerializer, TaskCreateUpdateSerializer
+from ..pagination import CustomPagination
 
 
 @api_view(['GET', 'POST'])
@@ -36,8 +37,11 @@ def retrive_update_delete_task(request, task_id):
 
 
 def list_task(request):
+    paginator = CustomPagination()
+
     tasks = Task.objects.filter(user=request.user)
-    serializer = TaskReadSerializer(tasks, many=True, context={'request':request})
+    tasks_page = paginator.paginate_queryset(tasks, request)
+    serializer = TaskReadSerializer(tasks_page, many=True, context={'request':request})
     return Response(serializer.data)
 
 

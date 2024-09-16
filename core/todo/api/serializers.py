@@ -29,10 +29,19 @@ class TaskReadSerializer(serializers.ModelSerializer):
     def get_link(self, obj):
         request = self.context.get('request')
         link = request.build_absolute_uri()
-        if not 'v' in link.split('/')[-3]:
-            # 'for list view add "id/" '
-            link = link + str(obj.id) + '/'
+        cleaned_link = self.clean_object_link(link, obj.id)
+        return cleaned_link
+    
+    def clean_object_link(self, link, obj_id):
+        if 'page=' in link.split('?')[-1]:
+            # discard page query parameter for single object link
+            link = link.split('?')[0]
+        if 'v' in link.strip().split('/')[-2]:
+            # 'add task id in list views
+            # for list view -2 index is v(number) but for detail it is -3
+            link = link + str(obj_id) + '/'
         return link
+
     
 
 class TaskCreateUpdateSerializer(serializers.ModelSerializer):
@@ -46,9 +55,17 @@ class TaskCreateUpdateSerializer(serializers.ModelSerializer):
     def get_link(self, obj):
         request = self.context.get('request')
         link = request.build_absolute_uri()
-        if not 'v' in link.split('/')[-3]:
-            # 'for list view add "id/" '
-            link = link + str(obj.id) + '/'
+        cleaned_link = self.clean_object_link(link, obj.id)
+        return cleaned_link
+    
+    def clean_object_link(self, link, obj_id):
+        if 'page=' in link.split('?')[-1]:
+            # discard page query parameter for single object link
+            link = link.split('?')[0]
+        if 'v' in link.strip().split('/')[-2]:
+            # 'add task id in list views
+            # for list view -2 index is v(number) but for detail it is -3
+            link = link + str(obj_id) + '/'
         return link
     
     def validate(self, validated_data):
