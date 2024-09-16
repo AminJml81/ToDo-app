@@ -14,5 +14,5 @@ urlpatterns = [
     path('<slug:slug>/update/', TaskUpdateView.as_view(), name='task-update'),
     path('api/v1/', include('todo.api.v1.urls')),
     path('api/v2/', include('todo.api.v2.urls')),
-
+    path('api/v3/', include('todo.api.v3.urls')),
 ]

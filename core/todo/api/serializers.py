@@ -27,7 +27,6 @@ class TaskReadSerializer(serializers.ModelSerializer):
 
 
 class TaskCreateUpdateSerializer(serializers.ModelSerializer):
-    status = serializers.SerializerMethodField()
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
 
@@ -45,5 +44,9 @@ class TaskCreateUpdateSerializer(serializers.ModelSerializer):
             validated_data['slug'] = slug
         return validated_data
     
-    def get_status(self, obj):
-        return obj.get_status_display()
+
+    def to_representation(self, instance):
+        representaion = super().to_representation(instance)
+        user = UserSerilizer(instance.user)
+        representaion['user'] = UserSerilizer(instance.user).data
+        return representaion
