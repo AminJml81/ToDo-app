@@ -15,5 +15,6 @@ urlpatterns = [
     path('api/v1/', include('todo.api.v1.urls')),
     path('api/v2/', include('todo.api.v2.urls')),
     path('api/v3/', include('todo.api.v3.urls')),
-    path('api/v4/', include('todo.api.v4.urls'))
+    path('api/v4/', include('todo.api.v4.urls')),
+    path('api/v5/', include('todo.api.v5.urls')),
 ]
