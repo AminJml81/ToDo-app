@@ -12,6 +12,7 @@ from ..filterset import TaskFilter
 class ListCreateTaskGenericView(GenericAPIView):
     permission_classes = [IsAuthenticated]
     filterset_class = TaskFilter
+    search_fields = ['title', 'description']
 
     def get_serializer_class(self):
         if self.request.method == "POST":
@@ -20,20 +21,9 @@ class ListCreateTaskGenericView(GenericAPIView):
     
     def get_queryset(self):
         tasks = Task.objects.filter(user=self.request.user)
-        # getting status, title, description query parameter and 
-        # filter the results
-        status = self.request.query_params.get('status')
-        title = self.request.query_params.get('title__icontains')
-        description = self.request.query_params.get('description__icontains')
-        if status:
-            tasks = tasks.filter(status=status)
-        if title:
-            tasks = tasks.filter(title__icontains=title)
-        if description:
-            tasks = tasks.filter(description__icontains=description)
-
+        tasks = self.filter_queryset(tasks)
         return tasks
-        
+            
 
     def get(self, request, *args, **kwargs):
         paginator = CustomPagination()

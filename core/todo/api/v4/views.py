@@ -9,6 +9,7 @@ from ..filterset import TaskFilter
 class ListCreateTaskGenericView(ListCreateAPIView):
     permission_classes = [IsAuthenticated]
     filterset_class = TaskFilter
+    search_fields = ['title', 'description']
 
     def get_serializer_class(self):
         if self.request.method == "POST":

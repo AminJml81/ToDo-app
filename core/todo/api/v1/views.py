@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404
+from django.db.models import Q
 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -41,6 +42,7 @@ def list_task(request):
 
     tasks = Task.objects.filter(user=request.user)
     filtered_tasks = filter_tasks(request, tasks)
+    filtered_tasks = search_tasks(request, tasks)
     tasks_page = paginator.paginate_queryset(filtered_tasks, request)
     serializer = TaskReadSerializer(tasks_page, many=True, context={'request':request})
     return Response(serializer.data)
@@ -58,6 +60,13 @@ def filter_tasks(request, tasks):
     if description:
         tasks = tasks.filter(description__icontains=description)
     return tasks
+
+def search_tasks(request, tasks):
+    search_key = request.query_params.get('search')
+    tasks = tasks.filter(Q(title__icontains=search_key) |
+                        Q(description__icontains=search_key))
+    return tasks
+
 
 def create_task(request):
     received_data = request.data

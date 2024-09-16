@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404
+from django.db.models import Q
 
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
@@ -10,15 +11,16 @@ from ...models import Task
 from ..serializers import TaskReadSerializer, TaskCreateUpdateSerializer
 from ..filterset import TaskFilter
 
+
 class ListCreateTaskAPIView(APIView):
     permission_classes = [IsAuthenticated]
-    filterset_class = TaskFilter
 
     def get(self, request):
         # task lists
         paginator = CustomPagination()
         tasks = Task.objects.filter(user=request.user)
         filtered_tasks = self.filter_tasks(request, tasks)
+        filtered_tasks = self.search_tasks(request, filtered_tasks)
         tasks_page = paginator.paginate_queryset(filtered_tasks, request)
         serializer = TaskReadSerializer(tasks_page, many=True, context={'request':request})
         return Response(serializer.data)
@@ -36,6 +38,12 @@ class ListCreateTaskAPIView(APIView):
             tasks = tasks.filter(title__icontains=title)
         if description:
             tasks = tasks.filter(description__icontains=description)
+        return tasks
+    
+    def search_tasks(self, request, tasks):
+        search_key = request.query_params.get('search')
+        tasks = tasks.filter(Q(title__icontains=search_key) |
+                            Q(description__icontains=search_key))
         return tasks
     
     def post(self, request):
