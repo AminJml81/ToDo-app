@@ -37,7 +37,7 @@ def retrive_update_delete_task(request, task_id):
 
 def list_task(request):
     tasks = Task.objects.filter(user=request.user)
-    serializer = TaskReadSerializer(tasks, many=True)
+    serializer = TaskReadSerializer(tasks, many=True, context={'request':request})
     return Response(serializer.data)
 
 
@@ -47,11 +47,11 @@ def create_task(request):
     if serializer.is_valid(raise_exception=True):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-    
+
 
 def retreive_task(request, task_id):
     task = get_object_or_404(Task, id=task_id, user=request.user)
-    serializer = TaskReadSerializer(task)
+    serializer = TaskReadSerializer(task, context={'request':request})
     return Response(serializer.data)
 
 
@@ -62,6 +62,7 @@ def update_task(request, task_id, partial):
     if serializer.is_valid(raise_exception=True):
         serializer.save()
         return Response(serializer.data)    
+
 
 def delete_task(request, task_id):
     task = get_object_or_404(Task, id=task_id, user=request.user)

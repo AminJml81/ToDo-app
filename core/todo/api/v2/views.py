@@ -12,10 +12,10 @@ from ..serializers import TaskReadSerializer, TaskCreateUpdateSerializer
 class ListCreateTaskAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get(self, reqeust):
+    def get(self, request):
         # task lists
-        tasks = Task.objects.filter(user=reqeust.user)
-        serializer = TaskReadSerializer(tasks, many=True)
+        tasks = Task.objects.filter(user=request.user)
+        serializer = TaskReadSerializer(tasks, many=True, context={'request':request})
         return Response(serializer.data)
     
 
@@ -34,7 +34,7 @@ class RetriveUpdateDeleteTaskAPIView(APIView):
     def get(self, request, task_id):
         # retrive task (task detail)
         task = get_object_or_404(Task, id=task_id)
-        serializer = TaskReadSerializer(task)
+        serializer = TaskReadSerializer(task, context={'request': request})
         return Response(serializer.data)
     
 

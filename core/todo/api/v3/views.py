@@ -20,8 +20,9 @@ class ListCreateTaskGenericView(GenericAPIView):
     
     def get(self, request, *args, **kwargs):
         items = self.get_queryset()
-        serializer = self.get_serializer(items, many=True)
+        serializer = self.get_serializer(items, many=True, context={'request':self.request})
         return Response(serializer.data)
+    
     
     def post(self, request, *args, **kwargs):
         receive_data = request.data
@@ -44,7 +45,6 @@ class RetriveUpdateDeleteTaskGenericView(GenericAPIView):
     
     def get(self, request, *args, **kwargs):
         task = self.get_object()
-        print(task)
         serializer = self.get_serializer(task)
         return Response(serializer.data)         
 

@@ -7,7 +7,7 @@ from todo.models import Task
 from accounts.models import User
 
 
-class UserSerilizer(serializers.ModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
@@ -15,25 +15,42 @@ class UserSerilizer(serializers.ModelSerializer):
 
 
 class TaskReadSerializer(serializers.ModelSerializer):
-    user = UserSerilizer()
+    user = UserSerializer()
     status = serializers.SerializerMethodField()
+    link = serializers.SerializerMethodField()
 
     class Meta:
         model = Task
-        fields = ['id', 'title', 'description', 'created_date', 'status', 'user']
+        fields = ['link','title', 'description', 'created_date', 'status', 'user']
     
     def get_status(self, obj):
         return obj.get_status_display()
-
+    
+    def get_link(self, obj):
+        request = self.context.get('request')
+        link = request.build_absolute_uri()
+        if not 'v' in link.split('/')[-3]:
+            # 'for list view add "id/" '
+            link = link + str(obj.id) + '/'
+        return link
+    
 
 class TaskCreateUpdateSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
-
+    link = serializers.SerializerMethodField()
 
     class Meta:
         model = Task
-        fields = ['id', 'title', 'description', 'status', 'user']
+        fields = ['link', 'title', 'description', 'status', 'user']
 
+    def get_link(self, obj):
+        request = self.context.get('request')
+        link = request.build_absolute_uri()
+        if not 'v' in link.split('/')[-3]:
+            # 'for list view add "id/" '
+            link = link + str(obj.id) + '/'
+        return link
+    
     def validate(self, validated_data):
         title = validated_data.get('title')
         if title:
@@ -44,10 +61,9 @@ class TaskCreateUpdateSerializer(serializers.ModelSerializer):
             validated_data['slug'] = slug
         return validated_data
     
-
     def to_representation(self, instance):
         representaion = super().to_representation(instance)
-        user = UserSerilizer(instance.user)
-        representaion['user'] = UserSerilizer(user).data
+        user = UserSerializer(instance.user).data
+        representaion['user'] = user
         representaion['status'] = instance.get_status_display()
         return representaion
