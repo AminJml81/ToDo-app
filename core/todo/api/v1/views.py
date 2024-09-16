@@ -40,10 +40,24 @@ def list_task(request):
     paginator = CustomPagination()
 
     tasks = Task.objects.filter(user=request.user)
-    tasks_page = paginator.paginate_queryset(tasks, request)
+    filtered_tasks = filter_tasks(request, tasks)
+    tasks_page = paginator.paginate_queryset(filtered_tasks, request)
     serializer = TaskReadSerializer(tasks_page, many=True, context={'request':request})
     return Response(serializer.data)
 
+def filter_tasks(request, tasks):
+    # getting status, title, description query parameter and 
+    # filter the tasks
+    status = request.query_params.get('status')
+    title = request.query_params.get('title')
+    description = request.query_params.get('description')
+    if status:
+        tasks = tasks.filter(status=status)
+    if title:
+        tasks = tasks.filter(title__icontains=title)
+    if description:
+        tasks = tasks.filter(description__icontains=description)
+    return tasks
 
 def create_task(request):
     received_data = request.data

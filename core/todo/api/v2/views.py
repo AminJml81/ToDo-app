@@ -8,21 +8,36 @@ from rest_framework import status
 from ..pagination import CustomPagination
 from ...models import Task
 from ..serializers import TaskReadSerializer, TaskCreateUpdateSerializer
-
+from ..filterset import TaskFilter
 
 class ListCreateTaskAPIView(APIView):
     permission_classes = [IsAuthenticated]
+    filterset_class = TaskFilter
 
     def get(self, request):
         # task lists
         paginator = CustomPagination()
-
         tasks = Task.objects.filter(user=request.user)
-        tasks_page = paginator.paginate_queryset(tasks, request)
+        filtered_tasks = self.filter_tasks(request, tasks)
+        tasks_page = paginator.paginate_queryset(filtered_tasks, request)
         serializer = TaskReadSerializer(tasks_page, many=True, context={'request':request})
         return Response(serializer.data)
     
 
+    def filter_tasks(self, request, tasks):
+        # getting status, title, description query parameter and 
+        # filter the tasks
+        status = request.query_params.get('status')
+        title = request.query_params.get('title')
+        description = request.query_params.get('description')
+        if status:
+            tasks = tasks.filter(status=status)
+        if title:
+            tasks = tasks.filter(title__icontains=title)
+        if description:
+            tasks = tasks.filter(description__icontains=description)
+        return tasks
+    
     def post(self, request):
         # create new task
         received_data = request.data

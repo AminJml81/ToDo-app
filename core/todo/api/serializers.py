@@ -33,8 +33,8 @@ class TaskReadSerializer(serializers.ModelSerializer):
         return cleaned_link
     
     def clean_object_link(self, link, obj_id):
-        if 'page=' in link.split('?')[-1]:
-            # discard page query parameter for single object link
+        if  len(link.split('?')) > 1:
+            # discard query parameters from link
             link = link.split('?')[0]
         if 'v' in link.strip().split('/')[-2]:
             # 'add task id in list views
@@ -43,7 +43,6 @@ class TaskReadSerializer(serializers.ModelSerializer):
         return link
 
     
-
 class TaskCreateUpdateSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
     link = serializers.SerializerMethodField()

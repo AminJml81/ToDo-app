@@ -3,11 +3,13 @@ from rest_framework.permissions import IsAuthenticated
 
 from ...models import Task
 from ..serializers import TaskReadSerializer, TaskCreateUpdateSerializer
-
+from ..filterset import TaskFilter
 
 class TaskViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
+    filterset_class = TaskFilter
     
+
     def get_queryset(self):
         return Task.objects.filter(user=self.request.user)
     

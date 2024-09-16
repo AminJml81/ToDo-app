@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     # third party
     'django.contrib.sites',
     'rest_framework',
+    'django_filters',
 
     # local
     'todo.apps.TodoConfig',
@@ -161,5 +162,6 @@ SITE_ID = 1
 # restframework 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'todo.api.pagination.CustomPagination',                                                  
-    'PAGE_SIZE': 10
+    'PAGE_SIZE': 10,
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
 }

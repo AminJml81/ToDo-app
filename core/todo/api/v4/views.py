@@ -3,10 +3,12 @@ from rest_framework.permissions import IsAuthenticated
 
 from ...models import Task
 from ..serializers import TaskReadSerializer, TaskCreateUpdateSerializer
+from ..filterset import TaskFilter
 
 
 class ListCreateTaskGenericView(ListCreateAPIView):
     permission_classes = [IsAuthenticated]
+    filterset_class = TaskFilter
 
     def get_serializer_class(self):
         if self.request.method == "POST":
