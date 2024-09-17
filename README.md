@@ -11,11 +11,11 @@
 
 
 ## API Versions Description
-### V1: Function Based with APIView
-### V2: Class Based with APIView
-### V3: Class Based with GenericView
-### V4: Class Based with GenericView Concrete Views
-### V5: class Based with Viewsets and Router
+#### V1: Function Based with APIView
+#### V2: Class Based with APIView
+#### V3: Class Based with GenericView
+#### V4: Class Based with GenericView Concrete Views
+#### V5: class Based with Viewsets and Router
  
 
 ## Technologies used
