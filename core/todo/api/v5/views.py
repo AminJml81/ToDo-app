@@ -7,8 +7,8 @@ from ..serializers import(
                         )
 from ..filterset import TaskFilter
 
+
 class TaskViewSet(ModelViewSet):
-    permission_classes = [IsAuthenticated]
     filterset_class = TaskFilter
     search_fields = ['title', 'description']
     lookup_field = 'slug'

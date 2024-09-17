@@ -14,7 +14,6 @@ from ..serializers import(
 
 
 @api_view(['GET', 'POST'])
-@permission_classes([IsAuthenticated])
 def list_create_task(request):
     if request.method == "GET":
         # tasks list
@@ -25,7 +24,6 @@ def list_create_task(request):
     
 
 @api_view(['GET', 'PUT', 'PATCH', 'DELETE'])
-@permission_classes([IsAuthenticated])
 def retrive_update_delete_task(request, slug):
     if request.method == "GET":
         # retrieve task (task detail)

@@ -10,7 +10,6 @@ from ..filterset import TaskFilter
 
 
 class ListCreateTaskGenericView(ListCreateAPIView):
-    permission_classes = [IsAuthenticated]
     filterset_class = TaskFilter
     search_fields = ['title', 'description']
 
@@ -25,7 +24,6 @@ class ListCreateTaskGenericView(ListCreateAPIView):
     
         
 class RetriveUpdateDeleteTaskGenericView(RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsAuthenticated]
     lookup_field = 'slug'
 
     def get_serializer_class(self):

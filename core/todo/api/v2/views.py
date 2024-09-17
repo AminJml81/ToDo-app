@@ -14,7 +14,6 @@ from ..serializers import(
 
 
 class ListCreateTaskAPIView(APIView):
-    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         # task lists
@@ -56,9 +55,7 @@ class ListCreateTaskAPIView(APIView):
         
 
 class RetriveUpdateDeleteTaskAPIView(APIView):
-    permission_classes = [IsAuthenticated]
     
-
     def get(self, request, slug):
         # retrive task (task detail)
         user = request.user
@@ -66,16 +63,13 @@ class RetriveUpdateDeleteTaskAPIView(APIView):
         serializer = TaskReadSerializer(task, context={'request': request})
         return Response(serializer.data)
     
-
     def put(self, request, slug):
         # update task
         return self.update(request, slug, partial=False)
 
-
     def patch(self, request, slug):
         # update task partially
         return self.update(request, slug, partial=True)
-
 
     def update(self, request, slug, partial):
         # main task of updating base on partial value 
@@ -88,7 +82,6 @@ class RetriveUpdateDeleteTaskAPIView(APIView):
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(serializer.data)
-
 
     def delete(self, request, slug):
         # delete task
