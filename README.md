@@ -53,4 +53,4 @@
 
 
 ## Project Model Schema
-![Project Model Schema](https://github.com/AminJml81/ToDo-app/images/model_schema.png)
+![Project Model Schema](https://github.com/AminJml81/ToDo-app/images/task_model_schema.png)
