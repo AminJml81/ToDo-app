@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'rest_framework',
     'django_filters',
+    'drf_yasg',
 
     # local
     'todo.apps.TodoConfig',
