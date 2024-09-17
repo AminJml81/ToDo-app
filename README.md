@@ -53,4 +53,4 @@
 
 
 ## Project Model Schema
-![Project Model Schema](/images/model_schema.png)
+![Project Model Schema](images/model_schema.png)
