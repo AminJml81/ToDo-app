@@ -6,5 +6,5 @@ app_name = 'api-v3'
 
 urlpatterns = [
     path('', ListCreateTaskGenericView.as_view(), name='task-list-create'),
-    path('<int:pk>/', RetriveUpdateDeleteTaskGenericView.as_view(), name='task-detail' )
+    path('<slug:slug>/', RetriveUpdateDeleteTaskGenericView.as_view(), name='task-detail' )
 ]

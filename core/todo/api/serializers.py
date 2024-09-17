@@ -29,22 +29,23 @@ class TaskReadSerializer(serializers.ModelSerializer):
     def get_link(self, obj):
         request = self.context.get('request')
         link = request.build_absolute_uri()
-        cleaned_link = self.clean_object_link(link, obj.id)
+        cleaned_link = self.clean_object_link(link, obj.slug)
         return cleaned_link
     
-    def clean_object_link(self, link, obj_id):
+    def clean_object_link(self, link, obj_slug):
         if  len(link.split('?')) > 1:
             # discard query parameters from link
             link = link.split('?')[0]
         if 'v' in link.strip().split('/')[-2]:
-            # 'add task id in list views
+            # 'add task slug in list views
             # for list view -2 index is v(number) but for detail it is -3
-            link = link + str(obj_id) + '/'
+            link = link + obj_slug + '/'
         return link
 
     
-class TaskCreateUpdateSerializer(serializers.ModelSerializer):
+class TaskCreateSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    # automatically get user from request
     link = serializers.SerializerMethodField()
 
     class Meta:
@@ -54,17 +55,18 @@ class TaskCreateUpdateSerializer(serializers.ModelSerializer):
     def get_link(self, obj):
         request = self.context.get('request')
         link = request.build_absolute_uri()
-        cleaned_link = self.clean_object_link(link, obj.id)
+        cleaned_link = self.clean_object_link(link, obj.slug)
         return cleaned_link
     
-    def clean_object_link(self, link, obj_id):
+    def clean_object_link(self, link, slug):
         if 'page=' in link.split('?')[-1]:
             # discard page query parameter for single object link
             link = link.split('?')[0]
         if 'v' in link.strip().split('/')[-2]:
-            # 'add task id in list views
-            # for list view -2 index is v(number) but for detail it is -3
-            link = link + str(obj_id) + '/'
+            # append task slug in list views
+            # note about condition: in list view index -2 is v(number) but for
+            # detail it is -3
+            link = link + slug + '/'
         return link
     
     def validate(self, validated_data):
@@ -73,6 +75,7 @@ class TaskCreateUpdateSerializer(serializers.ModelSerializer):
             # if task title is getting updated or new task is created
             slug = slugify(title)
             if not slug:
+                # bad title
                 raise ValidationError({"title":f"Invalid title '{title}' !!!"})
             validated_data['slug'] = slug
         return validated_data
@@ -83,3 +86,20 @@ class TaskCreateUpdateSerializer(serializers.ModelSerializer):
         representaion['user'] = user
         representaion['status'] = instance.get_status_display()
         return representaion
+    
+
+class TaskUpdateSerializer(TaskCreateSerializer):
+    
+    def update_link(self, old_link, slug):
+        old_link_parts = old_link.split('/')
+        old_link_parts[-2] = slug
+        new_link = '/'.join(old_link_parts)
+        return new_link
+    
+
+    def to_representation(self, instance):
+        # when task get updated its link should change
+        # thats why serializer for put & patch is different
+        reperesntaion =  super().to_representation(instance)
+        reperesntaion['link'] = self.update_link(reperesntaion['link'], slugify(reperesntaion['title']))
+        return reperesntaion

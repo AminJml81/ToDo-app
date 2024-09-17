@@ -8,8 +8,9 @@ from rest_framework import status
 
 from ..pagination import CustomPagination
 from ...models import Task
-from ..serializers import TaskReadSerializer, TaskCreateUpdateSerializer
-from ..filterset import TaskFilter
+from ..serializers import(
+                        TaskReadSerializer, TaskCreateSerializer, TaskUpdateSerializer
+                        )
 
 
 class ListCreateTaskAPIView(APIView):
@@ -18,11 +19,13 @@ class ListCreateTaskAPIView(APIView):
     def get(self, request):
         # task lists
         paginator = CustomPagination()
-        tasks = Task.objects.filter(user=request.user)
+        user = request.user
+        tasks = Task.objects.filter(user=user)
         filtered_tasks = self.filter_tasks(request, tasks)
         filtered_tasks = self.search_tasks(request, filtered_tasks)
         tasks_page = paginator.paginate_queryset(filtered_tasks, request)
-        serializer = TaskReadSerializer(tasks_page, many=True, context={'request':request})
+        serializer = TaskReadSerializer(tasks_page, many=True,
+                                         context={'request':request})
         return Response(serializer.data)
     
 
@@ -45,7 +48,8 @@ class ListCreateTaskAPIView(APIView):
     def post(self, request):
         # create new task
         received_data = request.data
-        serializer = TaskCreateUpdateSerializer(data=received_data, context={'request': request})
+        serializer = TaskCreateSerializer(data=received_data, 
+                                        context={'request': request})
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -53,36 +57,42 @@ class ListCreateTaskAPIView(APIView):
 
 class RetriveUpdateDeleteTaskAPIView(APIView):
     permission_classes = [IsAuthenticated]
+    
 
-    def get(self, request, task_id):
+    def get(self, request, slug):
         # retrive task (task detail)
-        task = get_object_or_404(Task, id=task_id)
+        user = request.user
+        task = get_object_or_404(Task, user=user, slug=slug)
         serializer = TaskReadSerializer(task, context={'request': request})
         return Response(serializer.data)
     
 
-    def put(self, request, task_id):
+    def put(self, request, slug):
         # update task
-        return self.update(request, task_id, partial=False)
+        return self.update(request, slug, partial=False)
 
 
-    def patch(self, request, task_id):
+    def patch(self, request, slug):
         # update task partially
-        return self.update(request, task_id, partial=True)
+        return self.update(request, slug, partial=True)
 
 
-    def update(self, request, task_id, partial):
-        # main task of updating base on partial value which is True for PATCH, False for PUT.
-        task = get_object_or_404(Task, id=task_id)
+    def update(self, request, slug, partial):
+        # main task of updating base on partial value 
+        # which is True for PATCH, False for PUT.
+        user = self.request.user
+        task = get_object_or_404(Task, slug=slug, user=user)
         update_data = request.data
-        serializer = TaskCreateUpdateSerializer(instance=task, data=update_data, partial=partial, context={'request': request})
+        serializer = TaskUpdateSerializer(instance=task, data=update_data,
+                                    partial=partial, context={'request': request})
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(serializer.data)
 
 
-    def delete(self, request, task_id):
+    def delete(self, request, slug):
         # delete task
-        task = get_object_or_404(Task, id=task_id)
+        user = request.user
+        task = get_object_or_404(Task, slug=slug, user=user)
         task.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

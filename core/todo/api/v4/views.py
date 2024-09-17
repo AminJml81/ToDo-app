@@ -2,7 +2,10 @@ from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIV
 from rest_framework.permissions import IsAuthenticated
 
 from ...models import Task
-from ..serializers import TaskReadSerializer, TaskCreateUpdateSerializer
+from ..serializers import(
+                           TaskReadSerializer, TaskCreateSerializer, TaskUpdateSerializer
+                        )
+
 from ..filterset import TaskFilter
 
 
@@ -13,20 +16,23 @@ class ListCreateTaskGenericView(ListCreateAPIView):
 
     def get_serializer_class(self):
         if self.request.method == "POST":
-            return TaskCreateUpdateSerializer
+            return TaskCreateSerializer
         return TaskReadSerializer
     
     def get_queryset(self):
-        return Task.objects.filter(user=self.request.user)
+        user = self.request.user
+        return Task.objects.filter(user=user)
     
         
 class RetriveUpdateDeleteTaskGenericView(RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated]
+    lookup_field = 'slug'
 
     def get_serializer_class(self):
         if self.request.method in ("PUT", "PATCH"):
-            return TaskCreateUpdateSerializer
+            return TaskUpdateSerializer
         return TaskReadSerializer
         
     def get_queryset(self):
-        return Task.objects.filter(user=self.request.user)
+        user = self.request.user
+        return Task.objects.filter(user=user)
