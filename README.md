@@ -53,4 +53,4 @@
 
 
 ## Project Model Schema
-![Project Model Schema](/images/model_schema.png)
+![task_model_schema](https://github.com/user-attachments/assets/d57397d6-f6a0-42e8-b196-b6bdf92544d7)
