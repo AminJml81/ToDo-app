@@ -5,7 +5,8 @@ from django.db.models import Q
 
 class EmailUsernameBackend(ModelBackend):
             
-    def authenticate(self, request, username=None, password=None, **kwargs):
+    @staticmethod
+    def authenticate(request, username=None, password=None, **kwargs):
         user_model = get_user_model()
         try:
             # username can contain @ so we should check both username, email fields with given data(username) and then match it with password.
