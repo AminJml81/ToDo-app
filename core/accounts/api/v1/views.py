@@ -1,4 +1,5 @@
 from rest_framework.generics import GenericAPIView
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.authtoken.models import Token
@@ -24,9 +25,8 @@ class RegistrationGenericView(GenericAPIView):
         serializer.save()
         email = serializer.validated_data['email']
         # TODO : send email
-        return Response({'detail':'email has been sent to {email}'}, status=status.HTTP_201_CREATED)
+        return Response({'detail':f'email has been sent to {email}'}, status=status.HTTP_201_CREATED)
     
-
 
 class TokenLoginGenericView(GenericAPIView):
     serializer_class = UserTokenLoginSerializer
@@ -39,3 +39,10 @@ class TokenLoginGenericView(GenericAPIView):
         user = serializer.validated_data.get('user')
         token, created = Token.objects.get_or_create(user=user)
         return Response({'token':token.key})
+
+
+class TokenLogoutGenericView(APIView):
+
+    def get(self, request, *args, **kwargs):
+        request.user.auth_token.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
