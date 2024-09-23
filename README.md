@@ -12,11 +12,20 @@
 
 ## API Versions Description
 #### V1: Function Based with APIView
+![v1](https://github.com/user-attachments/assets/3f51d720-54ff-47f6-bcfe-1865d094d9cd)
+
 #### V2: Class Based with APIView
+![v2](https://github.com/user-attachments/assets/9380ca9e-5e6d-4f23-bbe5-dcbecbb6a913)
+
 #### V3: Class Based with GenericView
+![v3](https://github.com/user-attachments/assets/a82fc11a-0eab-4c42-90d1-ab2ced756bf8)
+
 #### V4: Class Based with GenericView Concrete Views
+![v4](https://github.com/user-attachments/assets/6308fb65-ae7e-4bb3-a836-d6df570e2aeb)
+
 #### V5: class Based with Viewsets and Router
- 
+ ![v5](https://github.com/user-attachments/assets/35f18229-3730-4e5f-b0b8-a8c687658fe0)
+
 
 ## Technologies used
 * Django
