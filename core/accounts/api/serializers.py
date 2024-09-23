@@ -7,7 +7,6 @@ from django.core.exceptions import ValidationError
 
 User = get_user_model()
 class UserRegistrationSerilaizer(serializers.ModelSerializer):
-    username = serializers.CharField(required=True)
     password2 = serializers.CharField(required=True)
 
 
