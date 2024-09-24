@@ -4,10 +4,13 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 
-
 from django.contrib.auth import get_user_model
 
-from ..serializers import UserRegistrationSerilaizer, UserTokenLoginSerializer
+from ..serializers import(
+    UserRegistrationSerilaizer,
+    UserTokenLoginSerializer,
+    JWTTokenObtainPairSerializer
+)
 
 
 User = get_user_model()
@@ -46,3 +49,15 @@ class TokenLogoutGenericView(APIView):
     def get(self, request, *args, **kwargs):
         request.user.auth_token.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+
+class JWTTokenObtainPairView(GenericAPIView):
+    serializer_class = JWTTokenObtainPairSerializer
+    permission_classes = []
+    
+
+    def post(self, request, *args, **kwargs):
+        recieved_data = request.data
+        serializer = self.get_serializer(data=recieved_data)
+        serializer.is_valid(raise_exception=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

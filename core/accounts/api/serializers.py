@@ -1,13 +1,13 @@
 from rest_framework import serializers
+from rest_framework_simplejwt.settings import api_settings
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
-#from django.contrib.auth import authenticate
+from django.contrib.auth.models import update_last_login
 from django.core.exceptions import ValidationError
-from django.utils.translation import gettext_lazy as _
 
-from accounts.backends import EmailUsernameBackend
-
+from .utils import validate_user
 
 User = get_user_model()
 class UserRegistrationSerilaizer(serializers.ModelSerializer):
@@ -37,24 +37,46 @@ class UserRegistrationSerilaizer(serializers.ModelSerializer):
         return User.objects.create_user(**validated_data)
     
 
-
 class UserTokenLoginSerializer(serializers.Serializer):
     username_email = serializers.CharField(required=True)
-    password = serializers.CharField(required=True, style={"input_type": "password"})
+    password = serializers.CharField(required=True, style={"input_type": "password"}, write_only=True)
     token = serializers.CharField(read_only=True)
 
 
     def validate(self, attrs):
         validated_data = super().validate(attrs)
         username_email , password= validated_data['username_email'], validated_data['password']
-        user = EmailUsernameBackend.authenticate(request=self.context.get('request'),username=username_email, password=password)
-        if not user:
-            msg = _("Unable to log in with provided credentials.")
-            raise serializers.ValidationError({'credentials error':msg}, code='authentication')
-        if not user.is_verified:
-            msg = _("User is not verified.")
-            raise serializers.ValidationError({'not verified': msg}, code='verification')
-        
+        request = self.context.get('request')
+        user = validate_user(request, username_email, password)        
         validated_data['user']=user
 
         return validated_data
+    
+
+class JWTTokenObtainPairSerializer(serializers.Serializer):
+    username_email = serializers.CharField(required=True, write_only=True)
+    password = serializers.CharField(required=True, style={"input_type": "password"}, write_only=True)
+    access = serializers.CharField(read_only=True)
+    refresh = serializers.CharField(read_only=True)
+    
+    def validate(self, attrs):
+        validated_data = super().validate(attrs)
+        username_email , password= validated_data['username_email'], validated_data['password']
+        request = self.context.get('request')
+        user = validate_user(request, username_email, password)     
+
+        validated_data['access'], validated_data['refresh'] = self.create_jwt_tokens(user)
+
+        if api_settings.UPDATE_LAST_LOGIN:
+            update_last_login(None, user)
+
+        validated_data["email"] = user.email
+
+        return validated_data
+    
+    
+    def create_jwt_tokens(self, user):
+        token = RefreshToken.for_user(user)
+        refresh = str(token)
+        access= str(token.access_token)
+        return access, refresh
