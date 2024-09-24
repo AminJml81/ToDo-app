@@ -1,4 +1,4 @@
-from rest_framework_simplejwt.views import TokenRefreshView
+from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
 
 from django.urls import path
 
@@ -16,6 +16,7 @@ from .views import (
 #       jwt authentication:
 #            -jwt/create/ (create refresh & access token) ->Done
 #            -jwt/refresh/ (creates another access token if given access is valid) -> Done
+#            -jwt/verify/ verifies jwt token -> Done
 #       Account Activation
 #       Password reset
 #       Password change
@@ -30,4 +31,5 @@ urlpatterns = [
 
     path('jwt/create/', JWTTokenObtainPairView.as_view(), name='jwt-create'),
     path('jwt/refresh/', TokenRefreshView.as_view(), name='jwt-refresh'),
+    path('jwt/verify/', TokenVerifyView.as_view(), name='token-verify'),
 ]
