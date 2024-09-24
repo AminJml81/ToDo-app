@@ -1,3 +1,5 @@
+from rest_framework_simplejwt.views import TokenRefreshView
+
 from django.urls import path
 
 from .views import (
@@ -13,7 +15,7 @@ from .views import (
 #             -token/logout -> Done
 #       jwt authentication:
 #            -jwt/create/ (create refresh & access token) ->Done
-#            -jwt/verify/       
+#            -jwt/refresh/ (creates another access token if given access is valid) -> Done
 #       Account Activation
 #       Password reset
 #       Password change
@@ -27,4 +29,5 @@ urlpatterns = [
     path('token/logout/', TokenLogoutGenericView.as_view(), name='token-logout'),
 
     path('jwt/create/', JWTTokenObtainPairView.as_view(), name='jwt-create'),
+    path('jwt/refresh/', TokenRefreshView.as_view(), name='jwt-refresh'),
 ]
