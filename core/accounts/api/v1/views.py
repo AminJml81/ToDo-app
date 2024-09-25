@@ -5,13 +5,16 @@ from rest_framework import status
 from rest_framework.authtoken.models import Token
 
 from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
+
+from mail_templated import EmailMessage
 
 from ..serializers import(
     UserRegistrationSerilaizer,
     UserTokenLoginSerializer,
     JWTTokenObtainPairSerializer
 )
-
+from ..utils import EmailThread, create_token, decode_token
 
 User = get_user_model()
 
@@ -26,11 +29,18 @@ class RegistrationGenericView(GenericAPIView):
         serializer = UserRegistrationSerilaizer(data=recieved_data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        email = serializer.validated_data['email']
-        # TODO : send email
-        return Response({'detail':f'email has been sent to {email}'}, status=status.HTTP_201_CREATED)
+        user_email = serializer.validated_data['email']
+        user = get_object_or_404(User, email=user_email)
+        token = create_token(user,)
+        self.send_actvation_email(user_email, token)
+        return Response({'detail':f'an activation email has been sent to {user_email}'}, status=status.HTTP_201_CREATED)
     
+    def send_actvation_email(self, receiver_email, token):
+        context = {'token':token, 'user_email':receiver_email}
+        email = EmailThread('email/user_activation.tpl', receiver_email=[receiver_email], context=context)
+        email.start()
 
+    
 class TokenLoginGenericView(GenericAPIView):
     serializer_class = UserTokenLoginSerializer
     permission_classes = []
@@ -61,3 +71,19 @@ class JWTTokenObtainPairView(GenericAPIView):
         serializer = self.get_serializer(data=recieved_data)
         serializer.is_valid(raise_exception=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+class UserActivationConfirmApiView(APIView):
+    permission_classes = []
+
+    def get(self, request, token, *args, **kwargs):
+        user_id = decode_token(token)
+        if not user_id:
+            return Response({'Message':'Token is Expired or Invalid'}, status=status.HTTP_400_BAD_REQUEST)
+        user = get_object_or_404(User, pk=user_id)
+        if not user.is_verified:
+            user.is_verified = True
+            user.save()
+            return Response({'message':'your account has been activated.'})
+        else:
+            return Response({'message':'your account has already been activated !!!'})
