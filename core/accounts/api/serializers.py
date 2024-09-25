@@ -80,3 +80,23 @@ class JWTTokenObtainPairSerializer(serializers.Serializer):
         refresh = str(token)
         access= str(token.access_token)
         return access, refresh
+    
+
+class UserActivationResendSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+
+
+    def validate(self, attrs):
+        validated_data =  super().validate(attrs)
+        user_email = validated_data.get('email')
+        try:
+            user = User.objects.get(email=user_email)
+        except User.DoesNotExist:
+            raise ValidationError(
+                {'email':'user does not exists !!!'}
+            )
+        if user.is_verified:
+            raise ValidationError({'email':'your account has already been activated !!!'})
+        validated_data['user'] = user
+
+        return validated_data

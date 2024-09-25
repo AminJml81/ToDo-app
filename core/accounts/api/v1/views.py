@@ -12,7 +12,8 @@ from mail_templated import EmailMessage
 from ..serializers import(
     UserRegistrationSerilaizer,
     UserTokenLoginSerializer,
-    JWTTokenObtainPairSerializer
+    JWTTokenObtainPairSerializer,
+    UserActivationResendSerializer
 )
 from ..utils import EmailThread, create_token, decode_token
 
@@ -31,7 +32,7 @@ class RegistrationGenericView(GenericAPIView):
         serializer.save()
         user_email = serializer.validated_data['email']
         user = get_object_or_404(User, email=user_email)
-        token = create_token(user,)
+        token = create_token(user)
         self.send_actvation_email(user_email, token)
         return Response({'detail':f'an activation email has been sent to {user_email}'}, status=status.HTTP_201_CREATED)
     
@@ -87,3 +88,22 @@ class UserActivationConfirmApiView(APIView):
             return Response({'message':'your account has been activated.'})
         else:
             return Response({'message':'your account has already been activated !!!'})
+        
+
+class UserAtivationResendGenericView(GenericAPIView):
+    permission_classes = []
+    serializer_class = UserActivationResendSerializer
+
+    def post(self, request, *args, **kwargs):
+        recieved_data = request.data
+        serilizer = self.serializer_class(data=recieved_data)
+        serilizer.is_valid(raise_exception=True)
+        user, user_email = serilizer.validated_data['user'], serilizer.validated_data['email']
+        token = create_token(user)
+        self.send_actvation_email(user_email, token)
+        return Response({'detail':f'an activation email has been sent to {user_email} Again'})
+    
+    def send_actvation_email(self, receiver_email, token):
+        context = {'token':token, 'user_email':receiver_email}
+        email = EmailThread('email/user_activation.tpl', receiver_email=[receiver_email], context=context)
+        email.start()

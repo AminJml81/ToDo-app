@@ -7,7 +7,8 @@ from .views import (
         TokenLoginGenericView,
         TokenLogoutGenericView,
         JWTTokenObtainPairView,
-        UserActivationConfirmApiView
+        UserActivationConfirmApiView,
+        UserAtivationResendGenericView,
 ) 
 
 # TODO: Registraion -> Done
@@ -18,9 +19,9 @@ from .views import (
 #            -jwt/create/ (create refresh & access token) ->Done
 #            -jwt/refresh/ (creates another access token if given access is valid) -> Done
 #            -jwt/verify/ verifies jwt token -> Done
-#       Account Activation
+#       Account Activation:
 #            -activation/confirm -> Done
-#            -activation/resend
+#            -activation/resend -> Done
 #       Password reset
 #       Password change
 
@@ -29,6 +30,7 @@ app_name = 'api-v1'
 urlpatterns = [
     path('registration/', RegistrationGenericView.as_view() , name='registration'),
     path('activation/confirm/<str:token>/', UserActivationConfirmApiView.as_view(), name='activation'),
+    path('activation/resend/', UserAtivationResendGenericView.as_view(), name='activation-resend'),
 
     path('token/login/', TokenLoginGenericView.as_view(), name='token-login'),
     path('token/logout/', TokenLogoutGenericView.as_view(), name='token-logout'),
