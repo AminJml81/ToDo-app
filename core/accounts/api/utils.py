@@ -25,14 +25,12 @@ def validate_user(request, username_email, password):
 class EmailThread(Thread):
 
     def __init__(self, email_template, receiver_email, context):
-        # receiver and data are users and data related to that user
         super().__init__()
         self.email_obj = EmailMessage()
         self.email_obj.template_name = email_template
         self.email_obj.context = context
         self.email_obj.from_email = 'todo@admin.com'
         self.email_obj.to = receiver_email
-
 
     def run(self):
         self.email_obj.send()
@@ -56,3 +54,10 @@ def decode_token(token):
     else:
         # if token is valid, get user_id and return it
         return decoded_token.get('user_id')
+    
+
+def send_actvation_email(receiver_email, token):
+    template = 'email/user_activation.tpl'
+    context = {'token':token, 'user_email':receiver_email}
+    email = EmailThread(template, receiver_email=[receiver_email], context=context)
+    email.start()

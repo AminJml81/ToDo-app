@@ -7,15 +7,13 @@ from rest_framework.authtoken.models import Token
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 
-from mail_templated import EmailMessage
-
 from ..serializers import(
     UserRegistrationSerilaizer,
     UserTokenLoginSerializer,
     JWTTokenObtainPairSerializer,
     UserActivationResendSerializer
 )
-from ..utils import EmailThread, create_token, decode_token
+from ..utils import  send_actvation_email, create_token, decode_token
 
 User = get_user_model()
 
@@ -33,15 +31,10 @@ class RegistrationGenericView(GenericAPIView):
         user_email = serializer.validated_data['email']
         user = get_object_or_404(User, email=user_email)
         token = create_token(user)
-        self.send_actvation_email(user_email, token)
+        send_actvation_email(user_email, token)
         return Response({'detail':f'an activation email has been sent to {user_email}'}, status=status.HTTP_201_CREATED)
-    
-    def send_actvation_email(self, receiver_email, token):
-        context = {'token':token, 'user_email':receiver_email}
-        email = EmailThread('email/user_activation.tpl', receiver_email=[receiver_email], context=context)
-        email.start()
 
-    
+
 class TokenLoginGenericView(GenericAPIView):
     serializer_class = UserTokenLoginSerializer
     permission_classes = []
@@ -87,7 +80,7 @@ class UserActivationConfirmApiView(APIView):
             user.save()
             return Response({'message':'your account has been activated.'})
         else:
-            return Response({'message':'your account has already been activated !!!'})
+            return Response({'message':'your account has already been activated !!!'}, status=status.HTTP_400_BAD_REQUEST)
         
 
 class UserAtivationResendGenericView(GenericAPIView):
@@ -100,10 +93,5 @@ class UserAtivationResendGenericView(GenericAPIView):
         serilizer.is_valid(raise_exception=True)
         user, user_email = serilizer.validated_data['user'], serilizer.validated_data['email']
         token = create_token(user)
-        self.send_actvation_email(user_email, token)
+        send_actvation_email(user_email, token)
         return Response({'detail':f'an activation email has been sent to {user_email} Again'})
-    
-    def send_actvation_email(self, receiver_email, token):
-        context = {'token':token, 'user_email':receiver_email}
-        email = EmailThread('email/user_activation.tpl', receiver_email=[receiver_email], context=context)
-        email.start()
