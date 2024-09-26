@@ -7,9 +7,11 @@ from .views import (
         TokenLoginGenericView,
         TokenLogoutGenericView,
         JWTTokenObtainPairView,
-        UserActivationConfirmApiView,
+        UserActivationConfirmAPIView,
         UserAtivationResendGenericView,
         ChangePasswordGenericView,
+        ResetPasswordGenericView,
+        ResetPasswordConfirmGenericView,
 ) 
 
 # TODO: Registraion -> Done
@@ -31,7 +33,7 @@ app_name = 'api-v1'
 
 urlpatterns = [
     path('registration/', RegistrationGenericView.as_view() , name='registration'),
-    path('activation/confirm/<str:token>/', UserActivationConfirmApiView.as_view(), name='activation'),
+    path('activation/confirm/<str:token>/', UserActivationConfirmAPIView.as_view(), name='activation'),
     path('activation/resend/', UserAtivationResendGenericView.as_view(), name='activation-resend'),
 
     path('token/login/', TokenLoginGenericView.as_view(), name='token-login'),
@@ -42,4 +44,7 @@ urlpatterns = [
     path('jwt/verify/', TokenVerifyView.as_view(), name='token-verify'),
 
     path('change/password/', ChangePasswordGenericView.as_view(), name='change-password'),
+    path('reset/password/', ResetPasswordGenericView.as_view(), name='reset-password'),
+    path('reset/password/confirm/<str:token>/', ResetPasswordConfirmGenericView.as_view(), name='reset-password-confirm'),
+    # path('reset/password/done/')
 ]

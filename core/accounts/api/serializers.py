@@ -129,3 +129,25 @@ class ChangePasswordSeriliazer(serializers.Serializer):
         if not user.check_password(current_password):
             raise ValidationError({'current password': 'Wrong Password !!!'})
         return validated_data
+    
+
+class ResetPasswordSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+
+class ResetPasswordConfirmSerializer(serializers.Serializer):
+    new_password = serializers.CharField(style={"input_type": "password"})
+    new_password2 = serializers.CharField(style={"input_type": "password"}, write_only=True)
+
+
+    def validate(self, attrs):
+        validated_data =  super().validate(attrs)
+        new_password , new_password2 = validated_data.get('new_password'), validated_data.get('new_password2')
+        if new_password != new_password2:
+            raise ValidationError({'new passwords': "new passwords doesn't match"})
+        
+        try:
+            validate_password(new_password)
+        except ValidationError as e:
+            raise serializers.ValidationError({'new password': list(e.messages)})
+        return validated_data

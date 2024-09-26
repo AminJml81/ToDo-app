@@ -6,6 +6,7 @@ from django.conf import settings
 from mail_templated import EmailMessage
 from threading import Thread
 import jwt
+from datetime import datetime, timedelta, timezone
 
 from ..backends import EmailUsernameBackend
 
@@ -36,10 +37,19 @@ class EmailThread(Thread):
         self.email_obj.send()
 
 
-def create_token(user):
+def create_token_with_user(user):
     token = RefreshToken.for_user(user)
     return str(token.access_token)
 
+def create_token_with_email(email):
+    payload = {
+        'user_email': email,
+        'exp': (datetime.now() + timedelta(hours=24)),
+        'iat': datetime.now(timezone.utc).timestamp(),
+        }
+    token = jwt.encode(payload, settings.SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
+
+    return token
 
 def decode_token(token):
     # returns user_id if token is valid
@@ -56,8 +66,21 @@ def decode_token(token):
         return decoded_token.get('user_id')
     
 
-def send_actvation_email(receiver_email, token):
-    template = 'email/user_activation.tpl'
+def decode_token_with_email(token):
+    # returns email if token is valid
+    # raise Validation Error if Invalid
+    try:
+        decoded_token = jwt.decode(
+            token, key=settings.SECRET_KEY, algorithms=[settings.JWT_ALGORITHM]
+        )
+    except jwt.exceptions.PyJWTError:
+        return None
+
+    else:
+        # if token is valid, get user_email and return it
+        return decoded_token.get('user_email')
+    
+def send_email(template, receiver_email, token):
     context = {'token':token, 'user_email':receiver_email}
     email = EmailThread(template, receiver_email=[receiver_email], context=context)
     email.start()
