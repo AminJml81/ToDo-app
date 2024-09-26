@@ -9,6 +9,7 @@ from django.core.exceptions import ValidationError
 
 from .utils import validate_user
 
+
 User = get_user_model()
 class UserRegistrationSerilaizer(serializers.ModelSerializer):
     password = serializers.CharField(required=True, style={"input_type": "password"},)
@@ -99,4 +100,32 @@ class UserActivationResendSerializer(serializers.Serializer):
             raise ValidationError({'email':'your account has already been activated !!!'})
         validated_data['user'] = user
 
+        return validated_data
+    
+
+class ChangePasswordSeriliazer(serializers.Serializer):
+    current_password = serializers.CharField(style={"input_type": "password"}, write_only=True)
+    new_password = serializers.CharField(style={"input_type": "password"}, write_only=True)
+    new_password2 = serializers.CharField(style={"input_type": "password"}, write_only=True)
+
+    def validate(self, attrs):
+        # it checks 
+        # new passwords match 
+        # new password is strong 
+        # the current password is correct
+        validated_data =  super().validate(attrs)
+        new_password , new_password2 = validated_data.get('new_password'), validated_data.get('new_password2')
+        if new_password != new_password2:
+            raise ValidationError({'new passwords': "new passwords doesn't match"})
+        
+        try:
+            validate_password(new_password)
+        except ValidationError as e:
+            raise serializers.ValidationError({'new password': list(e.messages)})
+
+
+        current_password = validated_data.get('current_password')
+        user = self.context.get('user')
+        if not user.check_password(current_password):
+            raise ValidationError({'current password': 'Wrong Password !!!'})
         return validated_data

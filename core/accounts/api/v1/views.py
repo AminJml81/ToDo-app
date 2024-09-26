@@ -11,7 +11,8 @@ from ..serializers import(
     UserRegistrationSerilaizer,
     UserTokenLoginSerializer,
     JWTTokenObtainPairSerializer,
-    UserActivationResendSerializer
+    UserActivationResendSerializer,
+    ChangePasswordSeriliazer
 )
 from ..utils import  send_actvation_email, create_token, decode_token
 
@@ -95,3 +96,18 @@ class UserAtivationResendGenericView(GenericAPIView):
         token = create_token(user)
         send_actvation_email(user_email, token)
         return Response({'detail':f'an activation email has been sent to {user_email} Again'})
+    
+
+class ChangePasswordGenericView(GenericAPIView):
+    serializer_class = ChangePasswordSeriliazer
+
+
+    def post(self, request, *args, **kwargs):
+        recieved_data = request.data
+        user = request.user
+        serializer = self.serializer_class(data = recieved_data, context={'user':user})
+        serializer.is_valid(raise_exception=True)
+        new_password = serializer.validated_data.get('new_password')
+        user.set_password(new_password)
+        user.save()
+        return Response('message: your password was successfully changed.')
