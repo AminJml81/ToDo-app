@@ -103,7 +103,7 @@ class ChangePasswordSeriliazer(serializers.Serializer):
     new_password2 = serializers.CharField(style={"input_type": "password"}, write_only=True)
 
     def validate(self, attrs):
-        # it checks 
+        # it checks if
         # new passwords match 
         # new password is strong 
         # the current password is correct

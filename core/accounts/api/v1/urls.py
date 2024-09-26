@@ -14,21 +14,6 @@ from .views import (
         ResetPasswordConfirmGenericView,
 ) 
 
-# TODO: Registraion -> Done
-#       token authentication:
-#             -token/login -> Done
-#             -token/logout -> Done
-#       jwt authentication:
-#            -jwt/create/ (create refresh & access token) ->Done
-#            -jwt/refresh/ (creates another access token if given access is valid) -> Done
-#            -jwt/verify/ verifies jwt token -> Done
-#       Account Activation:
-#            -activation/confirm -> Done
-#            -activation/resend -> Done
-#      Password change -> Done 
-#      Password reset -> Done
-        
-
 app_name = 'api-v1'
 
 urlpatterns = [

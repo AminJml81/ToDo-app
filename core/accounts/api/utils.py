@@ -1,5 +1,4 @@
 from rest_framework.serializers import ValidationError
-from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.serializers import ValidationError
 
 from django.contrib.auth.password_validation import validate_password
