@@ -3,11 +3,10 @@ from rest_framework_simplejwt.settings import api_settings
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from django.contrib.auth import get_user_model
-from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.models import update_last_login
 from django.core.exceptions import ValidationError
 
-from .utils import validate_user
+from .utils import validate_user, validate_new_passwords
 
 
 User = get_user_model()
@@ -23,13 +22,8 @@ class UserRegistrationSerilaizer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         validated_data =  super().validate(attrs)
-        password, password2= validated_data['password'], validated_data['password2']
-        if password != password2:
-            raise serializers.ValidationError({'password':"Passwords doesn't match"})
-        try:
-            validate_password(password)
-        except ValidationError as e:
-            raise serializers.ValidationError({'password':list(e.messages)})
+        password, password2 = validated_data['password'], validated_data['password2']
+        validate_new_passwords(password, password2)
         return validated_data
     
 
@@ -115,15 +109,7 @@ class ChangePasswordSeriliazer(serializers.Serializer):
         # the current password is correct
         validated_data =  super().validate(attrs)
         new_password , new_password2 = validated_data.get('new_password'), validated_data.get('new_password2')
-        if new_password != new_password2:
-            raise ValidationError({'new passwords': "new passwords doesn't match"})
-        
-        try:
-            validate_password(new_password)
-        except ValidationError as e:
-            raise serializers.ValidationError({'new password': list(e.messages)})
-
-
+        validate_new_passwords(new_password, new_password2)
         current_password = validated_data.get('current_password')
         user = self.context.get('user')
         if not user.check_password(current_password):
@@ -143,11 +129,5 @@ class ResetPasswordConfirmSerializer(serializers.Serializer):
     def validate(self, attrs):
         validated_data =  super().validate(attrs)
         new_password , new_password2 = validated_data.get('new_password'), validated_data.get('new_password2')
-        if new_password != new_password2:
-            raise ValidationError({'new passwords': "new passwords doesn't match"})
-        
-        try:
-            validate_password(new_password)
-        except ValidationError as e:
-            raise serializers.ValidationError({'new password': list(e.messages)})
+        validate_new_passwords(new_password, new_password2)
         return validated_data

@@ -18,11 +18,10 @@ from ..serializers import(
 )
 from ..utils import(
     send_email, 
-    create_token_with_user,
+    create_token,
     decode_token,
-    create_token_with_email, 
-    decode_token_with_email
 )
+
 
 User = get_user_model()
 
@@ -39,7 +38,7 @@ class RegistrationGenericView(GenericAPIView):
         serializer.save()
         user_email = serializer.validated_data['email']
         user = get_object_or_404(User, email=user_email)
-        token = create_token_with_user(user)
+        token = create_token('user_id', user.id)
         send_email('email/user_activation.tpl', user_email, token)
         return Response({'detail':f'an activation email has been sent to {user_email}'}, status=status.HTTP_201_CREATED)
 
@@ -80,16 +79,16 @@ class UserActivationConfirmAPIView(APIView):
     permission_classes = []
 
     def get(self, request, token, *args, **kwargs):
-        user_id = decode_token(token)
+        user_id = decode_token(token, 'user_id')
         if not user_id:
             return Response({'Message':'Token is Expired or Invalid'}, status=status.HTTP_400_BAD_REQUEST)
         user = get_object_or_404(User, pk=user_id)
         if not user.is_verified:
             user.is_verified = True
             user.save()
-            return Response({'message':'your account has been activated.'})
+            return Response({'Message':'your account has been activated.'})
         else:
-            return Response({'message':'your account has already been activated !!!'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'Message':'your account has already been activated !!!'}, status=status.HTTP_400_BAD_REQUEST)
         
 
 class UserAtivationResendGenericView(GenericAPIView):
@@ -101,7 +100,7 @@ class UserAtivationResendGenericView(GenericAPIView):
         serilizer = self.serializer_class(data=recieved_data)
         serilizer.is_valid(raise_exception=True)
         user, user_email = serilizer.validated_data['user'], serilizer.validated_data['email']
-        token = create_token_with_user(user)
+        token = create_token('user_id', user.id)
         send_email('email/user_activation.tpl', user_email, token)
         return Response({'detail':f'an activation email has been sent to {user_email} Again'})
     
@@ -110,7 +109,7 @@ class ChangePasswordGenericView(GenericAPIView):
     serializer_class = ChangePasswordSeriliazer
 
 
-    def post(self, request, *args, **kwargs):
+    def put(self, request, *args, **kwargs):
         recieved_data = request.data
         user = request.user
         serializer = self.serializer_class(data = recieved_data, context={'user':user})
@@ -118,7 +117,7 @@ class ChangePasswordGenericView(GenericAPIView):
         new_password = serializer.validated_data.get('new_password')
         user.set_password(new_password)
         user.save()
-        return Response('message: your password was successfully changed.')
+        return Response('Message: your password was successfully changed.')
     
 
 class ResetPasswordGenericView(GenericAPIView):
@@ -130,7 +129,7 @@ class ResetPasswordGenericView(GenericAPIView):
         serializer = self.serializer_class(data=received_data)
         serializer.is_valid(raise_exception=True)
         user_email = serializer.data.get('email')
-        token = create_token_with_email(user_email)
+        token = create_token('user_email', user_email)
         send_email('email/userpassword_reset.tpl', user_email, token)
         return Response(f'we have sent an email to {user_email}.')
     
@@ -138,10 +137,10 @@ class ResetPasswordGenericView(GenericAPIView):
 class ResetPasswordConfirmGenericView(GenericAPIView):
     permission_classes = []
     serializer_class = ResetPasswordConfirmSerializer
-    
-        
+
+
     def put(self, request, token, *args, **kwargs):
-        user_email = decode_token_with_email(token)
+        user_email = decode_token(token, 'user_email')
         user = get_object_or_404(User, email=user_email)
         recieved_data = request.data
         serializer = self.serializer_class(data=recieved_data)
@@ -149,4 +148,4 @@ class ResetPasswordConfirmGenericView(GenericAPIView):
         new_password = serializer.data.get('new_password')
         user.set_password(new_password)
         user.save()
-        return Response({'message':'your password was successfully reset'})
+        return Response({'Message':'your password was successfully reset'})

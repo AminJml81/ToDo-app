@@ -26,7 +26,7 @@ from .views import (
 #            -activation/confirm -> Done
 #            -activation/resend -> Done
 #      Password change -> Done 
-#      Password reset
+#      Password reset -> Done
         
 
 app_name = 'api-v1'
@@ -46,5 +46,4 @@ urlpatterns = [
     path('change/password/', ChangePasswordGenericView.as_view(), name='change-password'),
     path('reset/password/', ResetPasswordGenericView.as_view(), name='reset-password'),
     path('reset/password/confirm/<str:token>/', ResetPasswordConfirmGenericView.as_view(), name='reset-password-confirm'),
-    # path('reset/password/done/')
 ]
