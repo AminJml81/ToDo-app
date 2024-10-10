@@ -1,12 +1,13 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.settings import api_settings
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.authtoken.models import Token
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import update_last_login
 from django.core.exceptions import ValidationError
 
-from .utils import validate_user, validate_new_passwords
+from .utils import validate_user, validate_new_passwords 
 
 
 User = get_user_model()
@@ -35,7 +36,6 @@ class UserRegistrationSerilaizer(serializers.ModelSerializer):
 class UserTokenLoginSerializer(serializers.Serializer):
     username_email = serializers.CharField(required=True)
     password = serializers.CharField(required=True, style={"input_type": "password"}, write_only=True)
-    token = serializers.CharField(read_only=True)
 
 
     def validate(self, attrs):
@@ -81,20 +81,20 @@ class UserActivationResendSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
 
 
-    def validate(self, attrs):
-        validated_data =  super().validate(attrs)
-        user_email = validated_data.get('email')
-        try:
-            user = User.objects.get(email=user_email)
-        except User.DoesNotExist:
-            raise ValidationError(
-                {'email':'user does not exists !!!'}
-            )
-        if user.is_verified:
-            raise ValidationError({'email':'your account has already been activated !!!'})
-        validated_data['user'] = user
+    # def validate(self, attrs):
+    #     validated_data =  super().validate(attrs)
+    #     user_email = validated_data.get('email')
+    #     try:
+    #         user = User.objects.get(email=user_email)
+    #     except User.DoesNotExist:
+    #         raise ValidationError(
+    #             {'email':'user does not exists !!!'}
+    #         )
+    #     if user.is_verified:
+    #         raise ValidationError({'email':'your account has already been activated !!!'})
+    #     validated_data['user'] = user
 
-        return validated_data
+    #     return validated_data
     
 
 class ChangePasswordSeriliazer(serializers.Serializer):

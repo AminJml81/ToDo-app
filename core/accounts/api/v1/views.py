@@ -53,7 +53,10 @@ class TokenLoginGenericView(GenericAPIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data.get('user')
         token, created = Token.objects.get_or_create(user=user)
-        return Response({'token':token.key})
+        if created:
+            return Response({'token':token.key}, status=status.HTTP_201_CREATED)
+        else:
+            return Response({'token':token.key}, status=status.HTTP_200_OK)
 
 
 class TokenLogoutGenericView(APIView):
@@ -81,7 +84,7 @@ class UserActivationConfirmAPIView(APIView):
     def get(self, request, token, *args, **kwargs):
         user_id = decode_token(token, 'user_id')
         if not user_id:
-            return Response({'Message':'Token is Expired or Invalid'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'Message':'Token is invalid or expired'}, status=status.HTTP_400_BAD_REQUEST)
         user = get_object_or_404(User, pk=user_id)
         if not user.is_verified:
             user.is_verified = True
@@ -99,7 +102,10 @@ class UserAtivationResendGenericView(GenericAPIView):
         recieved_data = request.data
         serilizer = self.serializer_class(data=recieved_data)
         serilizer.is_valid(raise_exception=True)
-        user, user_email = serilizer.validated_data['user'], serilizer.validated_data['email']
+        user_email = serilizer.data.get('email')
+        user = get_object_or_404(User, email=user_email)
+        if user.is_verified:
+            return Response({'detail':'your account has already been activated !!!'}, status=status.HTTP_400_BAD_REQUEST)
         token = create_token('user_id', user.id)
         send_email('email/user_activation.tpl', user_email, token)
         return Response({'detail':f'an activation email has been sent to {user_email} Again'})
@@ -117,7 +123,7 @@ class ChangePasswordGenericView(GenericAPIView):
         new_password = serializer.validated_data.get('new_password')
         user.set_password(new_password)
         user.save()
-        return Response('Message: your password was successfully changed.')
+        return Response({'Message':'your password was successfully changed.'})
     
 
 class ResetPasswordGenericView(GenericAPIView):
@@ -131,7 +137,7 @@ class ResetPasswordGenericView(GenericAPIView):
         user_email = serializer.data.get('email')
         token = create_token('user_email', user_email)
         send_email('email/userpassword_reset.tpl', user_email, token)
-        return Response(f'we have sent an email to {user_email}.')
+        return Response({'Message': f'we have sent an email to {user_email}.'})
     
 
 class ResetPasswordConfirmGenericView(GenericAPIView):
@@ -141,6 +147,8 @@ class ResetPasswordConfirmGenericView(GenericAPIView):
 
     def put(self, request, token, *args, **kwargs):
         user_email = decode_token(token, 'user_email')
+        if user_email is None:
+            return Response({'Message':'Token is invalid or expired'}, status=status.HTTP_400_BAD_REQUEST)
         user = get_object_or_404(User, email=user_email)
         recieved_data = request.data
         serializer = self.serializer_class(data=recieved_data)

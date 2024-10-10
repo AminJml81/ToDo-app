@@ -2,9 +2,11 @@ from rest_framework.serializers import ValidationError
 from rest_framework.serializers import ValidationError
 
 from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 from mail_templated import EmailMessage
+
 from threading import Thread
 import jwt
 from datetime import datetime, timedelta, timezone
