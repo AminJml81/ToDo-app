@@ -84,7 +84,7 @@ def update_task(request, slug, partial):
                                     partial=partial, context={'request': request})
     if serializer.is_valid(raise_exception=True):
         serializer.save()
-        return Response(serializer.data)
+        return Response(serializer.data, headers={'Location': task.get_absolute_url()})
     
 def delete_task(request, slug):
     user = request.user
