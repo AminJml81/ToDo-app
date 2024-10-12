@@ -87,7 +87,7 @@ def test_unauthenticated_user_create_task(client, user1):
     assert response.status_code == 401
     assert response_data == "Authentication credentials were not provided."
     # checking if new task was created or not.
-    assert Task.objects.filter(user=user1).exists() == False
+    assert not Task.objects.filter(user=user1).exists()
 
 
 @pytest.mark.django_db
@@ -129,7 +129,7 @@ def test_user2_create_task_with_exact_title_that_user1_has_task(
 
     # checking fields of new created task.
     assert response_data["title"] == "duplication test"
-    assert response_data["description"] == None
+    assert response_data["description"] is None
     assert response_data["status"] == "Todo"
     assert response_data["user"]["email"] == user1.email
 
@@ -192,7 +192,6 @@ def test_user_get_unavailable_task(client, user1_with_tasks):
 
 @pytest.mark.django_db
 def test_unauthenticated_user_get_unavailable_task(client, user1_with_tasks):
-    user = user1_with_tasks
     url = reverse("todo:api-v1:task-detail", kwargs={"slug": "not-available"})
     response = client.get(path=url)
     response_data = response.data.get("detail")
@@ -271,7 +270,6 @@ def test_user_update_task_partially_with_valid_data_but_duplicate_title(
     # it should not allow.
     user = user1_with_tasks
     client.force_authenticate(user)
-    task = Task.objects.get(title="edit test")
     number_of_tasks_for_this_user = len(user.tasks.all())
     url = reverse("todo:api-v1:task-detail", kwargs={"slug": "edit-test"})
     data = {"title": "duplication test"}
@@ -325,7 +323,6 @@ def test_unauthenticated_user_update_task_partially_with_no_data(client, user1):
 def test_unauthenticated_user_update_task_partially_with_valid_data_but_duplicate_title(
     client, user1_with_tasks
 ):
-    user = user1_with_tasks
     url = reverse("todo:api-v1:task-detail", kwargs={"slug": "edit-test"})
     data = {"description": "edited description for user1"}
     response = client.patch(path=url, data=data)

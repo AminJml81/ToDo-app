@@ -58,7 +58,7 @@ def test_change_password_with_token_with_invalid_data(
     client, active_user_with_token, current_password, new_password, new_password2
 ):
     url = reverse("account:api-v1:change-password")
-    user, token = active_user_with_token[0], active_user_with_token[1]
+    token = active_user_with_token[1]
     data = {
         "current_password": current_password,
         "new_password": new_password,

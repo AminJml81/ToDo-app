@@ -8,14 +8,14 @@ from ...utils import create_token
 @pytest.mark.django_db
 def test_activation_with_valid_token(client, user):
     token = create_token("user_id", user.id)
-    assert user.is_verified == False
+    assert not user.is_verified
     url = reverse("account:api-v1:activation", kwargs={"token": token})
     response = client.get(path=url)
     response_data = response.data.get("Message")
     assert response.status_code == 200
     assert response_data == "your account has been activated."
     user.refresh_from_db()
-    assert user.is_verified == True
+    assert user.is_verified
 
 
 @pytest.mark.django_db
