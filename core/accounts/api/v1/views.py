@@ -7,17 +7,17 @@ from rest_framework.authtoken.models import Token
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 
-from ..serializers import(
+from ..serializers import (
     UserRegistrationSerilaizer,
     UserTokenLoginSerializer,
     JWTTokenObtainPairSerializer,
     UserActivationResendSerializer,
     ChangePasswordSeriliazer,
     ResetPasswordSerializer,
-    ResetPasswordConfirmSerializer
+    ResetPasswordConfirmSerializer,
 )
-from ..utils import(
-    send_email, 
+from ..utils import (
+    send_email,
     create_token,
     decode_token,
 )
@@ -30,17 +30,19 @@ class RegistrationGenericView(GenericAPIView):
     serializer_class = UserRegistrationSerilaizer
     permission_classes = []
 
-
     def post(self, request, *args, **kwargs):
         recieved_data = request.data
         serializer = UserRegistrationSerilaizer(data=recieved_data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        user_email = serializer.validated_data['email']
+        user_email = serializer.validated_data["email"]
         user = get_object_or_404(User, email=user_email)
-        token = create_token('user_id', user.id)
-        send_email('email/user_activation.tpl', user_email, token)
-        return Response({'detail':f'an activation email has been sent to {user_email}'}, status=status.HTTP_201_CREATED)
+        token = create_token("user_id", user.id)
+        send_email("email/user_activation.tpl", user_email, token)
+        return Response(
+            {"detail": f"an activation email has been sent to {user_email}"},
+            status=status.HTTP_201_CREATED,
+        )
 
 
 class TokenLoginGenericView(GenericAPIView):
@@ -49,14 +51,14 @@ class TokenLoginGenericView(GenericAPIView):
 
     def post(self, request, *args, **kwargs):
         recieved_data = request.data
-        serializer = self.serializer_class(data = recieved_data)
+        serializer = self.serializer_class(data=recieved_data)
         serializer.is_valid(raise_exception=True)
-        user = serializer.validated_data.get('user')
+        user = serializer.validated_data.get("user")
         token, created = Token.objects.get_or_create(user=user)
         if created:
-            return Response({'token':token.key}, status=status.HTTP_201_CREATED)
+            return Response({"token": token.key}, status=status.HTTP_201_CREATED)
         else:
-            return Response({'token':token.key}, status=status.HTTP_200_OK)
+            return Response({"token": token.key}, status=status.HTTP_200_OK)
 
 
 class TokenLogoutGenericView(APIView):
@@ -64,35 +66,40 @@ class TokenLogoutGenericView(APIView):
     def get(self, request, *args, **kwargs):
         request.user.auth_token.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-    
+
 
 class JWTTokenObtainPairView(GenericAPIView):
     serializer_class = JWTTokenObtainPairSerializer
     permission_classes = []
-    
 
     def post(self, request, *args, **kwargs):
         recieved_data = request.data
         serializer = self.get_serializer(data=recieved_data)
         serializer.is_valid(raise_exception=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
+
 
 class UserActivationConfirmAPIView(APIView):
     permission_classes = []
 
     def get(self, request, token, *args, **kwargs):
-        user_id = decode_token(token, 'user_id')
+        user_id = decode_token(token, "user_id")
         if not user_id:
-            return Response({'Message':'Token is invalid or expired'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"Message": "Token is invalid or expired"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         user = get_object_or_404(User, pk=user_id)
         if not user.is_verified:
             user.is_verified = True
             user.save()
-            return Response({'Message':'your account has been activated.'})
+            return Response({"Message": "your account has been activated."})
         else:
-            return Response({'Message':'your account has already been activated !!!'}, status=status.HTTP_400_BAD_REQUEST)
-        
+            return Response(
+                {"Message": "your account has already been activated !!!"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
 
 class UserAtivationResendGenericView(GenericAPIView):
     permission_classes = []
@@ -102,29 +109,33 @@ class UserAtivationResendGenericView(GenericAPIView):
         recieved_data = request.data
         serilizer = self.serializer_class(data=recieved_data)
         serilizer.is_valid(raise_exception=True)
-        user_email = serilizer.data.get('email')
+        user_email = serilizer.data.get("email")
         user = get_object_or_404(User, email=user_email)
         if user.is_verified:
-            return Response({'detail':'your account has already been activated !!!'}, status=status.HTTP_400_BAD_REQUEST)
-        token = create_token('user_id', user.id)
-        send_email('email/user_activation.tpl', user_email, token)
-        return Response({'detail':f'an activation email has been sent to {user_email} Again'})
-    
+            return Response(
+                {"detail": "your account has already been activated !!!"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        token = create_token("user_id", user.id)
+        send_email("email/user_activation.tpl", user_email, token)
+        return Response(
+            {"detail": f"an activation email has been sent to {user_email} Again"}
+        )
+
 
 class ChangePasswordGenericView(GenericAPIView):
     serializer_class = ChangePasswordSeriliazer
 
-
     def put(self, request, *args, **kwargs):
         recieved_data = request.data
         user = request.user
-        serializer = self.serializer_class(data = recieved_data, context={'user':user})
+        serializer = self.serializer_class(data=recieved_data, context={"user": user})
         serializer.is_valid(raise_exception=True)
-        new_password = serializer.validated_data.get('new_password')
+        new_password = serializer.validated_data.get("new_password")
         user.set_password(new_password)
         user.save()
-        return Response({'Message':'your password was successfully changed.'})
-    
+        return Response({"Message": "your password was successfully changed."})
+
 
 class ResetPasswordGenericView(GenericAPIView):
     permission_classes = []
@@ -134,26 +145,28 @@ class ResetPasswordGenericView(GenericAPIView):
         received_data = request.data
         serializer = self.serializer_class(data=received_data)
         serializer.is_valid(raise_exception=True)
-        user_email = serializer.data.get('email')
-        token = create_token('user_email', user_email)
-        send_email('email/userpassword_reset.tpl', user_email, token)
-        return Response({'Message': f'we have sent an email to {user_email}.'})
-    
+        user_email = serializer.data.get("email")
+        token = create_token("user_email", user_email)
+        send_email("email/userpassword_reset.tpl", user_email, token)
+        return Response({"Message": f"we have sent an email to {user_email}."})
+
 
 class ResetPasswordConfirmGenericView(GenericAPIView):
     permission_classes = []
     serializer_class = ResetPasswordConfirmSerializer
 
-
     def put(self, request, token, *args, **kwargs):
-        user_email = decode_token(token, 'user_email')
+        user_email = decode_token(token, "user_email")
         if user_email is None:
-            return Response({'Message':'Token is invalid or expired'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"Message": "Token is invalid or expired"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         user = get_object_or_404(User, email=user_email)
         recieved_data = request.data
         serializer = self.serializer_class(data=recieved_data)
         serializer.is_valid(raise_exception=True)
-        new_password = serializer.data.get('new_password')
+        new_password = serializer.data.get("new_password")
         user.set_password(new_password)
         user.save()
-        return Response({'Message':'your password was successfully reset'})
+        return Response({"Message": "your password was successfully reset"})

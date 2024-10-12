@@ -8,7 +8,7 @@ from django.utils.translation import gettext_lazy as _
 
 class UserManager(BaseUserManager):
     """
-    Custom user model manager where email is the unique identifiers 
+    Custom user model manager where email is the unique identifiers
         for authentication instead of usernames.
     """
 
@@ -50,11 +50,14 @@ class User(AbstractUser):
     """
     Custom User Model for authentication management through email address instead of username
     """
-    email = models.EmailField(_("email address"),
-                    unique=True,
-                    error_messages={
-                        "unique": _("A user with that Email already exists."),
-                    },)
+
+    email = models.EmailField(
+        _("email address"),
+        unique=True,
+        error_messages={
+            "unique": _("A user with that Email already exists."),
+        },
+    )
     is_verified = models.BooleanField(default=False)
 
     created_date = models.DateTimeField(auto_now_add=True)

@@ -4,7 +4,7 @@ from django.db.models import Q
 
 
 class EmailUsernameBackend(ModelBackend):
-            
+
     @staticmethod
     def authenticate(request, username=None, password=None, **kwargs):
         user_model = get_user_model()
@@ -14,7 +14,7 @@ class EmailUsernameBackend(ModelBackend):
             user = user_model.objects.get(Q(username=username) | Q(email=username))
             if user.check_password(password):
                 return user
-            
+
         except user_model.DoesNotExist:
             return None
 
@@ -25,7 +25,6 @@ class EmailUsernameBackend(ModelBackend):
     #     user_model = get_user_model()
     #     try:
     #         return user_model.objects.get(pk=user_id)
-        
+
     #     except user_model.DoesNotExist:
     #         return None
-        

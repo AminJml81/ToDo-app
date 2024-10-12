@@ -1,7 +1,7 @@
 from core.settings import *
 
 
-INSTALLED_APPS += ['django_extensions',"debug_toolbar"]
+INSTALLED_APPS += ["django_extensions", "debug_toolbar"]
 
 MIDDLEWARE.insert(3, "debug_toolbar.middleware.DebugToolbarMiddleware")
 

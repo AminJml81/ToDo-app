@@ -8,16 +8,23 @@ class CustomUserAdmin(UserAdmin):
     """
     Custom admin panel for user management with add and change forms plus password
     """
+
     model = User
-    list_display = ("email", "username", "is_superuser", "is_active", 'is_verified')
-    list_filter = ("email", "username", "is_superuser", "is_active", 'is_verified')
-    searching_fields = ("username", "email",)
-    ordering = ("username", "email",)
+    list_display = ("email", "username", "is_superuser", "is_active", "is_verified")
+    list_filter = ("email", "username", "is_superuser", "is_active", "is_verified")
+    searching_fields = (
+        "username",
+        "email",
+    )
+    ordering = (
+        "username",
+        "email",
+    )
     fieldsets = (
         (
             "Authentication",
             {
-                "fields": ('username', "email", "password"),
+                "fields": ("username", "email", "password"),
             },
         ),
         (
@@ -50,7 +57,7 @@ class CustomUserAdmin(UserAdmin):
             {
                 "classes": ("wide",),
                 "fields": (
-                    'username',
+                    "username",
                     "email",
                     "password1",
                     "password2",

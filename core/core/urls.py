@@ -14,6 +14,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
 from django.contrib import admin
 from django.urls import path, include
 
@@ -25,31 +26,38 @@ from .settings import DEBUG
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path('tasks/', include('todo.urls')),
-    path('accounts/', include("accounts.urls")),
-    path('api-auth/', include('rest_framework.urls')),
+    path("tasks/", include("todo.urls")),
+    path("accounts/", include("accounts.urls")),
+    path("api-auth/", include("rest_framework.urls")),
 ]
 
 schema_view = get_schema_view(
-   openapi.Info(
-      title="Todo API",
-      default_version='all',
-      description="Full API Documentation",
-      terms_of_service="https://www.google.com/policies/terms/",
-      contact=openapi.Contact(email="jamali.amin.dev@mail.com"),
-      license=openapi.License(name="MIT License"),
-   ),
-   public=True,
-   permission_classes=(permissions.AllowAny,),
+    openapi.Info(
+        title="Todo API",
+        default_version="all",
+        description="Full API Documentation",
+        terms_of_service="https://www.google.com/policies/terms/",
+        contact=openapi.Contact(email="jamali.amin.dev@mail.com"),
+        license=openapi.License(name="MIT License"),
+    ),
+    public=True,
+    permission_classes=(permissions.AllowAny,),
 )
 
 urlpatterns += [
-   path('swagger<format>/', schema_view.without_ui(cache_timeout=0), name='schema-json'),
-   path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-   path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+    path(
+        "swagger<format>/", schema_view.without_ui(cache_timeout=0), name="schema-json"
+    ),
+    path(
+        "swagger/",
+        schema_view.with_ui("swagger", cache_timeout=0),
+        name="schema-swagger-ui",
+    ),
+    path("redoc/", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"),
 ]
 
 
 if DEBUG:
     from debug_toolbar.toolbar import debug_toolbar_urls
+
     urlpatterns += debug_toolbar_urls()

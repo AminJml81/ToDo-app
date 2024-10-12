@@ -8,22 +8,20 @@ from todo.models import Task
 
 # NOTE: user means authenticated user.
 
+
 def create_task_data(title, description, status):
     data = {}
     if title:
-        data['title'] = title
+        data["title"] = title
     if description:
-        data['description'] = description
+        data["description"] = description
     if status:
-        data['status'] = status
+        data["status"] = status
 
     return data
 
-STATUS_DICT = {
-    'TD': "Todo",
-    'IP': 'InProgress',
-    'DO': 'Done'
-}
+
+STATUS_DICT = {"TD": "Todo", "IP": "InProgress", "DO": "Done"}
 
 # # NOTE POST: CREATE TASK.
 # @pytest.mark.parametrize('title, description, status',[
@@ -42,7 +40,7 @@ STATUS_DICT = {
 #     response = client.post(path=url, data=data)
 #     response_data = response.data
 #     assert response.status_code == 201
-    
+
 #     task = Task.objects.get(title=title)
 #     # checking new task fields.
 #     assert response_data['title'] == task.title == title
@@ -54,7 +52,7 @@ STATUS_DICT = {
 #     assert task.slug == slugify(title)
 
 #     # checking if new task was created or not.
-#     assert number_of_tasks_for_this_user + 1  == len(user1.tasks.all()) 
+#     assert number_of_tasks_for_this_user + 1  == len(user1.tasks.all())
 
 # @pytest.mark.django_db
 # def test_user_create_task_with_invalid_data(client, user1):
@@ -69,8 +67,8 @@ STATUS_DICT = {
 #     assert response_data == 'This field is required.'
 
 #     # checking if new task was created or not.
-#     assert number_of_tasks_for_this_user == len(user1.tasks.all()) 
-    
+#     assert number_of_tasks_for_this_user == len(user1.tasks.all())
+
 # @pytest.mark.django_db
 # def test_unauthenticated_user_create_task(client, user1):
 #     url = reverse('todo:api-v5:task-list')
@@ -116,8 +114,8 @@ STATUS_DICT = {
 #     assert response.status_code == 201
 
 #     # assert one task for this user has been created.
-#     assert number_of_tasks_for_this_user + 1  == len(user1.tasks.all()) 
-    
+#     assert number_of_tasks_for_this_user + 1  == len(user1.tasks.all())
+
 #     # checking fields of new created task.
 #     assert response_data['title'] == 'duplication test'
 #     assert response_data['description'] == None
@@ -125,7 +123,7 @@ STATUS_DICT = {
 #     assert response_data['user']['email'] == user1.email
 
 
-# # NOTE GET: List TASKS. 
+# # NOTE GET: List TASKS.
 # @pytest.mark.django_db
 # def test_user_list_tasks(client, user1_with_tasks):
 #     user = user1_with_tasks
@@ -161,13 +159,15 @@ STATUS_DICT = {
 #         response = client.get(path=url)
 #         assert response.status_code == 200
 
+
 @pytest.mark.django_db
 def test_unauthenticated_user_get_task(client, user1):
-    url = reverse('todo:api-v5:task-detail', kwargs={'slug':'first-task-for-user1'})
+    url = reverse("todo:api-v5:task-detail", kwargs={"slug": "first-task-for-user1"})
     response = client.get(path=url)
-    response_data = response.data.get('detail')
+    response_data = response.data.get("detail")
     assert response.status_code == 401
-    assert response_data == 'Authentication credentials were not provided.'
+    assert response_data == "Authentication credentials were not provided."
+
 
 # @pytest.mark.django_db
 # def test_user_get_unavailable_task(client, user1_with_tasks):
@@ -443,12 +443,12 @@ def test_unauthenticated_user_get_task(client, user1):
 #     url = reverse('todo:api-v5:task-detail', kwargs={'slug':'delete-test'})
 #     response = client.delete(path=url)
 #     assert response.status_code == 204
-    
+
 #     # checking DELETE method deletes the task instance.
 #     assert number_of_tasks_for_this_user == len(user.tasks.all()) + 1
 
 #     with pytest.raises(task.DoesNotExist):
-#         task.refresh_from_db() 
+#         task.refresh_from_db()
 
 # @pytest.mark.django_db
 # def test_user_delete_unavailable_task(client, user1_with_tasks):
