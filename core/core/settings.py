@@ -199,3 +199,7 @@ SIMPLE_JWT = {
 }
 
 JWT_ALGORITHM = config("JWT_ALGORITHM", default="HS256")
+
+
+# celery configs
+CELERY_BROKER_URL = 'redis://redis:6379/1'
