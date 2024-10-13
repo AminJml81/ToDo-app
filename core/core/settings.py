@@ -213,7 +213,7 @@ from celery.schedules import crontab
 CELERY_BEAT_SCHEDULE = {
     "delete_user_tasks": {
         "task": "todo.tasks.delete_user_tasks",
-        "schedule": crontab(minute=20),
+        "schedule": crontab(minute=10),
     },
     "delete_unverified_users": {
         "task": "todo.tasks.delete_unverifed_users",

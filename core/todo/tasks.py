@@ -7,7 +7,7 @@ from celery import shared_task
 
 @shared_task
 def delete_user_tasks():
-    # Delete tasks of verified and not superuser each 20 minutes.
+    # Delete tasks of verified and not superuser each 10 minutes.
     users = get_user_model().objects.filter(is_verified=True, is_superuser=True)
     for user in users:
         tasks = Task.objects.filter(user=user)

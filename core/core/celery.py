@@ -29,9 +29,9 @@ app.autodiscover_tasks()
 # @app.on_after_configure.connect
 # def setup_periodic_tasks(sender, **kwargs):
 #     sender.add_periodic_task(
-#         crontab(minute=20),
+#         crontab(minute=10),
 #         delete_user_tasks.s(),
-#         name="delete user tasks every 20 minutes.",
+#         name="delete user tasks every 10 minutes.",
 #     )
 #     sender.add_periodic_task(
 #         crontab(hour=0),
