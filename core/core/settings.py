@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     "rest_framework.authtoken",
     "rest_framework_simplejwt",
     "mail_templated",
+    "django_celery_beat",
     # local
     "todo.apps.TodoConfig",
     "accounts.apps.AccountsConfig",
@@ -202,4 +203,20 @@ JWT_ALGORITHM = config("JWT_ALGORITHM", default="HS256")
 
 
 # celery configs
-CELERY_BROKER_URL = 'redis://redis:6379/1'
+CELERY_BROKER_URL = "redis://redis:6379/1"
+
+
+# NOTE: METHOD 1 to add celery beat(periodic task).
+# -------------------------------------------------
+from celery.schedules import crontab
+
+CELERY_BEAT_SCHEDULE = {
+    "delete_user_tasks": {
+        "task": "todo.tasks.delete_user_tasks",
+        "schedule": crontab(minute=20),
+    },
+    "delete_unverified_users": {
+        "task": "todo.tasks.delete_unverifed_users",
+        "schedule": crontab(hour=0),
+    },
+}
