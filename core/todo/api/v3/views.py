@@ -1,7 +1,8 @@
 from rest_framework.generics import GenericAPIView
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
+
+from django.core.cache import cache
 
 from ...models import Task
 from ..serializers import TaskReadSerializer, TaskCreateSerializer, TaskUpdateSerializer
@@ -20,7 +21,10 @@ class ListCreateTaskGenericView(GenericAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        return Task.objects.filter(user=user)
+        tasks = cache.get_or_set(
+            f"{user}--tasks", Task.objects.filter(user=user), timeout=5 * 60
+        )
+        return tasks
 
     def get(self, request, *args, **kwargs):
         paginator = CustomPagination()
@@ -35,9 +39,10 @@ class ListCreateTaskGenericView(GenericAPIView):
     def post(self, request, *args, **kwargs):
         receive_data = request.data
         serializer = self.get_serializer(data=receive_data)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        cache.delete(f"{self.request.user}--tasks")
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class RetriveUpdateDeleteTaskGenericView(GenericAPIView):
@@ -71,11 +76,13 @@ class RetriveUpdateDeleteTaskGenericView(GenericAPIView):
         serializer = self.get_serializer(
             instance=task, data=update_data, partial=partial
         )
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            return Response(serializer.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        cache.delete(f"{self.request.user}--tasks")
+        return Response(serializer.data)
 
     def delete(self, request, *args, **kwargs):
         task = self.get_object()
         task.delete()
+        cache.delete(f"{self.request.user}--tasks")
         return Response(status=status.HTTP_204_NO_CONTENT)

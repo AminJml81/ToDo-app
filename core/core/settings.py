@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     # local
     "todo.apps.TodoConfig",
     "accounts.apps.AccountsConfig",
+    "weather.apps.WeatherConfig",
 ]
 
 MIDDLEWARE = [
@@ -208,15 +209,30 @@ CELERY_BROKER_URL = "redis://redis:6379/1"
 
 # NOTE: METHOD 1 to add celery beat(periodic task).
 # -------------------------------------------------
-from celery.schedules import crontab
+# from celery.schedules import crontab
 
-CELERY_BEAT_SCHEDULE = {
-    "delete_user_tasks": {
-        "task": "todo.tasks.delete_user_tasks",
-        "schedule": crontab(minute=10),
-    },
-    "delete_unverified_users": {
-        "task": "todo.tasks.delete_unverifed_users",
-        "schedule": crontab(hour=0),
-    },
+# CELERY_BEAT_SCHEDULE = {
+#     "delete_user_tasks": {
+#         "task": "todo.tasks.delete_user_tasks",
+#         "schedule": crontab(minute=10),
+#     },
+#     "delete_unverified_users": {
+#         "task": "todo.tasks.delete_unverifed_users",
+#         "schedule": crontab(hour=0),
+#     },
+#     "delete_yesterday_wather_caches": {
+#         "task": "weather.tasks.delete_yesterday_caches",
+#         "schedule": crontab(hour=0),
+#     },
+# }
+
+# Caching Configs
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": "redis://redis:6379/2",
+        # "OPTIONS": {
+        #     "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        # }
+    }
 }

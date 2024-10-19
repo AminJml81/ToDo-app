@@ -1,8 +1,8 @@
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
+from django.core.cache import cache
 
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -17,7 +17,9 @@ class ListCreateTaskAPIView(APIView):
         # task lists
         paginator = CustomPagination()
         user = request.user
-        tasks = Task.objects.filter(user=user)
+        tasks = cache.get_or_set(
+            f"{user}--tasks", Task.objects.filter(user=user), timeout=5 * 60
+        )
         filtered_tasks = self.filter_tasks(request, tasks)
         filtered_tasks = self.search_tasks(request, filtered_tasks)
         tasks_page = paginator.paginate_queryset(filtered_tasks, request)
@@ -49,9 +51,10 @@ class ListCreateTaskAPIView(APIView):
         serializer = TaskCreateSerializer(
             data=received_data, context={"request": request}
         )
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        cache.delete(f"{self.request.user}--tasks")
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class RetriveUpdateDeleteTaskAPIView(APIView):
@@ -83,13 +86,15 @@ class RetriveUpdateDeleteTaskAPIView(APIView):
             partial=partial,
             context={"request": request},
         )
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            return Response(serializer.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        cache.delete(f"{self.request.user}--tasks")
+        return Response(serializer.data)
 
     def delete(self, request, slug):
         # delete task
         user = request.user
         task = get_object_or_404(Task, slug=slug, user=user)
         task.delete()
+        cache.delete(f"{self.request.user}--tasks")
         return Response(status=status.HTTP_204_NO_CONTENT)

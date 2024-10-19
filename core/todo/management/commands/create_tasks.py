@@ -42,8 +42,8 @@ class Command(BaseCommand):
         )
 
     def create_user(self):
-        email = self.fake.email()
+        email, password = self.fake.email(), self.fake.password()
         user = User.objects.create_user(
-            email=email, password=self.fake.password(), username=email.split("@")[0]
+            email=email, password=password, username=email.split("@")[0]
         )
         return user

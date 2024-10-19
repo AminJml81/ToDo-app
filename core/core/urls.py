@@ -28,6 +28,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("tasks/", include("todo.urls")),
     path("accounts/", include("accounts.urls")),
+    path("weather/", include("weather.urls")),
     path("api-auth/", include("rest_framework.urls")),
 ]
 
