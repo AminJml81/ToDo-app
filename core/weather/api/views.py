@@ -12,7 +12,7 @@ class WeatherViewGenericView(GenericAPIView):
     authentication_classes = []
     permission_classes = []
     base_url = "https://api.weatherapi.com/v1/current.json"
-    api_key = config("WEATHER_API_KEY")
+    api_key = config("WEATHER_API_KEY", default='weather-api-key')
 
     def get(self, request, location, *args, **kwargs):
         if not cache.get(f"{timezone.now().day}-{location}"):
